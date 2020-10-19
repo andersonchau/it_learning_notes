@@ -1,0 +1,170 @@
+Docker ( daemon ) 
+Provides isolation for containers , handle command from clients
+
+Docker Container 
+Each container Hold one set of application 
+
+Docker Image
+A file which hold those apps and resource, to be deployed to container 
+
+DockerFile 
+Configuration file which hold commands to build docker Image
+
+#CentOS 7 , installation of Docker 
+lsb_release -a
+yum install -y redhat-lsb-core
+uname -a 
+
+yum install -y docker
+systemctl start docker # start docker service 
+yum install https://yum.dockerproject.org/repo/main/centos/7/Packages/docker-engine-17.05.0.ce-1.el7.centos.x86_64.rpm
+# install docker with a specific version
+
+# to remove docker 
+rpm -qa|grep docker # check what docker 
+yum remove docker-client
+yum remove docker-common
+
+cd /etc
+rm –rf docker
+cd /var/lib
+rm –rf docker
+
+systemctl enable docker  # enable docker every time when system startup 
+https://ithelp.ithome.com.tw/articles/10190824 # on how to change docker.sock's permission 
+
+docker search ubuntu -f is-official=true # search ubuntu docker image
+docker pull ubuntu  # download ubuntu image to local repository from Official DockerHub
+docker images # shows 
+docker run -it ubuntu /bin/bash  # run the ubuntu image and enter ubuntu with bash shell
+docker ps -a # check which process of docker container is running
+
+
+====================================================================================================================
+Writing a docker file, having name "DockerFile"
+FROM centos:7   # This docker image will depend on centos7 image
+MAINTAINER jack # Jack write this docker file 
+
+RUN yum install -y wget # install wget for centos 6 
+
+RUN cd 
+
+ADD jdk-8u152-linux-x64.tar.gz /    # copy jdk (with unzip operation) to / of centos7  
+ 
+RUN wget http://apache.stu.edu.tw/tomcat/tomcat-7/v7.0.82/bin/apache-tomcat-7.0.82.tar.gz # 
+RUN tar zxvf apache-tomcat-7.0.82.tar.gz
+
+ENV JAVA_HOME=/jdk1.8.0_152 # set environment variable 
+ENV PATH=$PATH:/jdk1.8.0_152/bin
+CMD ["/apache-tomcat-7.0.82/bin/catalina.sh", "run"]  // run tomcat on startup
+=================================================================================================
+docker build -t mytomcat . --no-cache # build image and rename it to mytomcat
+docker run mytomcat # run docker image
+docker run -p 8080:8080 mytomcat #map Docker port 8080 to localhost port 8080, first is host, second is container
+
+
+docker run -d -p 5000:5000 -v /home/user1/storage:/var/lib/registry --name registry registry:2
+# start docker private registry 
+# -d background mode, -p portmapping , -v map docker /var/lib/regsitry to home /home/user1/storage , --name dockername (it is run on docker)
+# 2 is new version of registry 
+
+docker tag mytomcat 192.168.182.134:5000/mytomcat #give tag name to docker image
+docker push 192.168.182.134:5000/mytomcat # push docker image to registry 
+
+#loosen permission settings
+vi /etc/docker/daemon.json
+{
+  "live-restore": true,  
+  "group": "dockerroot", #docker.sock permission 
+  "insecure-registries": ["192.168.182.134:5000"]  # allow insecure registry 
+} 
+
+systemctl restart docker
+
+List all repositories (effectively images):
+
+curl -X GET https://myregistry:5000/v2/_catalog
+> {"repositories":["redis","ubuntu"]}
+
+List all tags for a repository:
+
+curl -X GET https://myregistry:5000/v2/ubuntu/tags/list
+> {"name":"ubuntu","tags":["14.04"]}
+
+
+docker start registry 
+
+docker run -d -p 8080:8080 --name registry-web --link registry -e REGISTRY_URL=http://192.168.182.134:5000/v2 hyper/docker-registry-web
+#docker registry UI , can access with a browser
+=============================================================================================================================
+
+docker save -o mytomcat.tar mytomcat # export a docker image to a file 
+docker load -i mytomcat.tar # import a docker image from a file.
+
+docker run -d -p 8080:80 --restart=always --name nginx nginx # --restart=always -> always try to restart container when crashed or restarted host, 
+docker logs nginx
+docker ps -a	
+docker rm -f nginx # remove a container 
+docker rmi docker.io/nginx # remove a container image
+
+
+docker exec -it nginx /bin/bash # enter to bash shell of centos 
+docker start nginx # start a container 
+docker stop nginx # stop a container
+
+
+docker exec -it nginx /bin/bash
+echo "HELLOWORLD" > hello.txt
+docker export nginx > nginx.tar
+cat nginx.tar | docker import - nginxbak
+
+
+docker run -it -v /home/user1/storage:/storage centos /bin/bash # map host /home/user1/storage to container's storage
+docker run -it -v /storage centos /bin/bash # in case of not definining mapped driver on host 
+docker volume ls , docker inspect -f '{{.Mounts}}' 4c2a9ef663c2 (container ID) 
+# you can also define volume on DockerFile but cannot be given host directory of mapped drive in DockerFile
+# can share file between containers. 
+
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+An Example :
+
+FROM java # you dont need to install java
+MAINTAINER jack
+RUN apt-get update && apt-get install -y wget
+RUN cd /
+RUN wget http://apache.stu.edu.tw/tomcat/tomcat-7/v7.0.82/bin/apache-tomcat-7.0.82.tar.gz
+RUN tar zxvf apache-tomcat-7.0.82.tar.gz
+VOLUME ["/apache-tomcat-7.0.82/webapps"]
+CMD ["/apache-tomcat-7.0.82/bin/catalina.sh", "run"]
+*******************************************************
+docker build -t tomcatserver .
+docker inspect -f '{{.Mounts}}' tomcat # find the path 
+
+in DockerFile, 
+EXPOSE 8080 , it will expose container's 8080 port , but you have to check where does it map to after running 
+docker build -t tomcatporttest .
+docker run -d -P tomcatporttest	
+docker ps -a # to check container ID 
+docker port 2fec91391edb # to check what does 8080 map to 
+
+docker run -d -p 8080:8080 tomcatporttest #<- better use this for deterministic results
+===============================================================================================================================
+Container network mode :
+none : no network allowed for container
+host: share the same network stack with the host , it seems like container is just a process of the host
+bridge: host act as a bridge/NAT/ROUTER , host IP: 192.168.1.10 , Container IP : 172.17.0.2 
+overlay: ( for container - container's communication)
+container:
+
+=================================================================================================================================
+docker stats nginx1 # check docker resource 
+docker run --memory 512MB --name nginx3 -d nginx // limit to 512MB
+docker run --cpu-period=1000000 --cpu-quota=500000 --name cputest2 -it centos /bin/bash # limit CPU time ,quota
+=================================================================================================================================
+
+Docker-compose 
+Dockeer-machine 
+Docker Swarm 
+
+https://mkyong.com/docker/docker-spring-boot-examples/
+online docker tutorial
