@@ -1,0 +1,225 @@
+Spring Data JPA learning notes :
+
+
+
+-@EnableTransactionManagement
+-class level transaction, transaction apply to all public method.
+
+rollback 
+Rollback is done by runtime exception, if also need to rollback for checked exception 
+rollbackfor = exception.class
+
+
+
+Transactional isolation :
+@Transactional(isolation=Isolation.READ_COMMITTED/REPEATABLE_READ/SERIALIZABLE)
+read uncommitted(allow dirty read)  -- x=0 , Ta : set x = 1, Tb : read x = 1 , Ta rollback 
+read committed(set write lock , allow non-repeatable read ) -- x=0 , Tb : read x = 0 , Ta : set x =1 , Ta : commit, Ta : read x =1  
+repeatable read(also set read lock, allow phantom read ) , Ta may get different row count in different read. 
+serializable      -- All transactions are serialized, severe performance penalty.
+
+If not defined , follow DB's TL
+MySQL - repeatable read. 
+Oracle - read committed.
+
+Transaction propagation : 
+-- PROPAGATION_RREQUIRED : Support a current transaction, create a new one if none exists. 
+-- PROPAGATION_RSUPPORTS : Support a current transaction, execute non-transactionally if none exists. 
+-- PROPAGATION_RMANDATORY : Support a current transaction, throw an exception if none exists
+-- PROPAGATION_RREQUIRES_NEW : Create a new transaction, suspend the current transaction if one exists. 
+-- PROPAGATION_NOT_SUPPORTED : Execute non-transactionally, suspend the current transaction if one exists
+also Ref; 
+https://www.ibm.com/developerworks/library/j-ts1/index.html
+
+Annotation 
+@Entity // tell spring this is DB Object 
+@Table(name = "notes") // define table name
+@Id  // this is primary key 
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+@Column(name="TestName",unique = true) // define DB field name in table, unique useful for create constraint when table not exist
+
+One to One relationship : 
+CascadeType.PERSIST	在儲存時一併儲存 被參考的物件。
+CascadeType.MERGE	在合併修改時一併 合併修改被參考的物件。
+CascadeType.REMOVE	在移除時一併移除 被參考的物件。
+CascadeType.REFRESH	在更新時一併更新 被參考的物件。
+CascadeType.ALL	無論儲存、合併、 更新或移除，一併對被參考物件作出對應動作。
+
+public class User implements Serializable {
+ // mappedBy ( at the non-owning(no foreign key) side, meaning relationship is handled by other side) 
+ // 
+ @OneToOne(mappedBy = "user", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
+    private Address address;
+	
+public class Address implements Serializable {
+	  @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false) // foreign key user_id 
+    private User user;
+	
+Typical save operation : 
+User user = new User("John Doe", "john.doe@example.com", "1234abcd");
+Address address = new Address("Lake View 321", "Berlin", "Berlin","95781", "DE");
+address.setUser(user); // set child reference
+user.setAddress(address);  // set parent reference
+userRepository.save(user); 
+
+=================================================================================================
+One to Many case
+@OneToMany(mappedBy = "book", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
+    private Set<Page> pages;
+
+
+ @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "book_id", nullable = false)
+    private Book book;
+=================================================================================================
+	Book book = new Book("11111", "ABC", "123456"); // New state
+    bookRepository.save(book); // make it to managed state Managed state, assign the primary key.
+    pageRepository.save(new Page(1, "Introduction to Philosophy", book));
+    pageRepository.save(new Page(65, "Java 8", book));
+=================================================================================================
+Many to Many case 
+T_COURSE(id), T_STUDENT_COURSE(student_id,course_id), T_STUDENT_COURSE(id)
+
+public class Student implements Serializable {
+@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "students_courses",
+            joinColumns = {
+                    @JoinColumn(name = "student_id", referencedColumnName = "id",
+                            nullable = false, updatable = false)},
+            inverseJoinColumns = {
+                    @JoinColumn(name = "course_id", referencedColumnName = "id",
+                            nullable = false, updatable = false)})
+    private Set<Course> courses = new HashSet<>();
+	
+public class Course implements Serializable {
+	 @ManyToMany(mappedBy = "courses", fetch = FetchType.LAZY)
+    private Set<Student> students = new HashSet<>();
+	
+Example : 
+
+            Student student = new Student("John Doe", 15, "8th");
+        studentRepository.save(student);
+      Course course1 = new Course("Machine Learning", "ML", 12, 1500);
+            Course course2 = new Course("Database Systems", "DS", 8, 800);
+            Course course3 = new Course("Web Basics", "WB", 10, 0);
+     courseRepository.saveAll(Arrays.asList(course1, course2, course3));
+            student.getCourses().addAll(Arrays.asList(course1, course2, course3));	 // build relationship 
+          studentRepository.save(student); 	 // persist 
+=================================================================================================
+JPQL query :
+public interface UserRepository extends JpaRepository<User, Long> {
+ 
+    List<Author> findByFirstName(String firstName); // logics auto-generated
+	List<User> findByNameAndAge(String name, int age);
+	List<User> findByActiveAndBirthDateOrNameAndAge(boolean active,Date dob, String name, int age); // AND > OR
+	List<User> findByNameEquals(String name);
+	List<User> findByEmailIsNotNull();
+	List<User> findByActiveFalse();
+	List<User> findByNameStartsWith(String prefix);
+	List<User> findByNameContaining(String infix);
+	//String pattern = "%atta%@gmail%";
+List<User> users = userRepository.findByEmailLike(pattern);
+List<User> findByAgeGreaterThanEqual(int age);
+List<User> findByBirthDateBefore(Date before);
+List<User> findByNameIgnoreCase(String name);
+List<User> findByNameContainingOrderByNameAsc(String name);
+//Pageable pageable = PageRequest.of(0, 10);
+//Page<User> userPage = userRepository.findByActive(true, pageable)
+Page<User> findByActive(boolean active, Pageable pageable);
+
+@Query("SELECT n FROM Note n WHERE n.featured = true")
+List<Note> findByActiveNotes();
+
+@Query(value = "SELECT * FROM Notes n WHERE n.featured = 1",
+            nativeQuery = true) // true SQL 
+List<Note> findByFeaturedNotesNative();
+
+// single bind parameter
+@Query("SELECT n FROM Note n WHERE n.title = ?1")
+List<Note> findByTitlePositionalBind(String title);
+
+// multiple bind parameters
+@Query("SELECT n FROM Note n WHERE n.title = ?1 AND n.featured = ?2")
+List<Note> findByTitleAndFeaturedPositionalBind(String title, boolean featured);
+
+@Query("SELECT n FROM Note n WHERE n.title = :title AND n.featured = :featured")
+List<Note> findByTitleAndFeaturedNamedBind(@Param("featured") boolean featured,
+                                           @Param("title") String title);
+										   
+@Query("SELECT u FROM User u WHERE " +
+        "lower(u.name) LIKE lower(CONCAT('%', :keyword, '%')) OR " +
+        "lower(u.email) LIKE lower(CONCAT('%', :keyword, '%'))")
+List<User> searchUsers(@Param("keyword") String keyword);
+@Query("SELECT n FROM Note n WHERE n.featured = ?1 ORDER BY n.created DESC")
+List<Note> findByFeaturedOrderByCreatedDesc(boolean featured);
+Pageable pageable = PageRequest.of(0, 10, Sort.by("title").descending());
+Page<Note> notePage = noteRepository.findAllNotesWithPagination(pageable);
+
+@Modifying
+@Query("UPDATE Note n SET n.title = ?1 WHERE n.id = ?2")
+int updateTitleById(String title, Long id);
+
+@Modifying
+@Query("DELETE FROM Note n WHERE n.featured = ?1 AND n.id IN ?2")
+void bulkDeleteByFeatured(boolean featured, Set<Long> id);
+}
+
+some example : 
+select i from MyTable i 
+where 
+i.id in (select i1.id from MyTable i1 
+                           where i1.streetId = :streetId 
+                                 and i1.cityId = :cityId) 
+or 
+i.id in (select i2.id from MyTable i2 
+                           where i2.streetId is null 
+                                 and i2.cityId = :cityId) 
+or 
+i.id in (select i3.id from MyTable i3 
+                           where i3.streetId = :streetId 
+                                 and i3.cityId is null)
+
+
+@Query(value = "SELECT * FROM Person p WHERE p.firstName = :firstName",
+        countQuery = "SELECT count(*) Person p WHERE p.firstName = :firstName",
+        nativeQuery = true)
+		
+Pageable pageable = PageRequest.of(0, 10, Sort.by("age").descending());
+
+// mutlple sort parameters
+Pageable pageable = PageRequest.of(0, 10, Sort.by("age").descending()
+        .and(Sort.by("lastName").ascending()));		
+Page<Person> findByFirstNameNativeSQL(@Param("firstName") String firstName, Pageable pageable);
+=================================================================================================
+Named query
+
+@NamedQueries({
+        @NamedQuery(name = "Book.findAllJPQL",
+                query = "SELECT b FROM Book b ORDER BY b.title DESC"),
+        @NamedQuery(name = "Book.findByTitleJPQL",
+                query = "SELECT b FROM Book b WHERE b.title = ?1"),
+        @NamedQuery(name = "Book.findByTitleAndPagesGreaterThanJPQL",
+                query = "SELECT b FROM Book b WHERE b.title = :title AND b.pages > :pages")
+})
+public class Book {
+    // ...
+}
+In controller 
+@PersistenceContext
+private EntityManager em;
+
+Query q = em.createNamedQuery("Book.findByIsbnNative");
+q.setParameter("isbn", "145804");
+// execute query
+Book book = (Book) q.getSingleResult();
+=================================================================================================
+
+http://zetcode.com/springboot/querydsl/
+
+https://www.jianshu.com/p/69dcb1b85bbb **
+
+JPAQueryFactory
+QueryDslPredicateExecutor<T>
