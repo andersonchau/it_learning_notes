@@ -1,0 +1,16 @@
+git cheatsheet for reminder :
+git clone repo_url 
+git add file/folder # add to local repository. 
+git commit -m "abc" # commit to local repo 
+git push # push change to remote repo.
+(git push https://username:password@github.com/ansonchau2007/test_git_cmd.git)
+
+git clone https://username:password@github.com/ansonchau2007/test_git_cmd.git
+
+git branch # view branch info 
+git branch cat # create new branch named cat 
+git checkout cat # switch to local branch cat, modify, commit 
+git checkout master # then go back to master  
+git merge cat # then merge back to 
+if there is conflict , check the files , remove === <<< >>>> and do commit. 
+or rebase
