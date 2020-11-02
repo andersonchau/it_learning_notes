@@ -1,0 +1,94 @@
+Mongodb learning/ notes 
+mongodb client to atlas : mongo "mongodb+srv://cluster0.tomvt.mongodb.net/demo" --username anson2004
+
+
+commands : 
+
+>db # show all databases 
+>db.stats() # gives statistics information
+>show dbs # show all databases
+>db.dropDatabase() # drop db, use it after use demo
+>db.collection.drop() # drop a table
+
+>use demo # switch db to demo 
+
+RMDBS       MongoDB
+database	database	
+table	collection	
+row	document	
+column	field	
+index	index	索引
+table joins	 	表连接,MongoDB不支持
+primary key	primary key
+
+
+> db.myNewCollection1.insertOne( { x: 1 } ) # insert a document(row) in collection(table)
+result : 
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5f9f7493bb442f625c915018")
+}
+
+=====================================================================================
+> show collections/db.getCollectionNames()/show tables # show all tables.  
+> db.myNewCollection1.insertOne( { y: 1 } )
+> db.myNewCollection1.insertOne( { y: 1,y:2 } ) # this is OKAY!? , gives y : 2
+> db.myNewCollection1.insertOne( { y: "1" } ) # note data type 1 =/="1" , including query
+> db.myNewCollection1.insertOne( { y: {z:10} } )
+> db.myNewCollection1.insertOne( { y: 1,x:2 } ) 
+
+>db.inventory.insertMany([
+   { item: "journal", qty: 25, size: { h: 14, w: 21, uom: "cm" }, status: "A" },
+   { item: "notebook", qty: 50, size: { h: 8.5, w: 11, uom: "in" }, status: "A" },
+   { item: "paper", qty: 100, size: { h: 8.5, w: 11, uom: "in" }, status: "D" },
+   { item: "planner", qty: 75, size: { h: 22.85, w: 30, uom: "cm" }, status: "D" },
+   { item: "postcard", qty: 45, size: { h: 10, w: 15.25, uom: "cm" }, status: "A" }
+]);
+
+=====================================================================================
+Query : 
+
+> db.myNewCollection1.find(); # select all entries in table myNewCollection1
+{ "_id" : ObjectId("5f9f7493bb442f625c915018"), "x" : 1 }
+{ "_id" : ObjectId("5f9f7714809f9ae8f088be93"), "y" : 1 }
+{ "_id" : ObjectId("5f9f79babcdacadbefa329e4"), "y" : { "z" : 10 } }
+# notice, can have different "schema"
+
+> db.myNewCollection1.find(); # gives all results 
+> db.myNewCollection1.find({"y.z":10}) # access deeper elements{ "_id" : ObjectId("5f9f79babcdacadbefa329e4"), "y" : { "z" : 10 } }
+> db.myNewCollection1.find( { "y.z": { $gt: 5 } } )
+> db.myNewCollection1.find( { "x": 2, "y":1 } ) # default AND condition
+> db.myNewCollection1.find(
+  { $or: [ { "x": 2 }, { "y": 1 } ] }
+) # or operations 
+db.inventory.find( { status: { $in: [ "A", "D" ] } } ) # WHERE STATUS IN ("A","D")
+db.inventory.find( { status: "A", qty: { $lt: 30 } } ) # WHERE status = "A"  AND qty < 30
+db.inventory.find( { $or: [ { status: "A" }, { qty: { $lt: 30 } } ] } )
+db.inventory.find( {
+     status: "A",
+     $or: [ { qty: { $lt: 30 } }, { item: /^p/ } ]
+} ) # SELECT * FROM inventory WHERE status = "A" AND ( qty < 30 OR item LIKE "p%")
+# or use findOne
+=====================================================================================
+Date : 
+> db.test.insert({date: ISODate()}) 
+> db.test.insert({date: new Date()})
+{ "_id" : ObjectId("..."), "date" : ISODate("2014-02-10T10:50:42.389Z") }
+{ "_id" : ObjectId("..."), "date" : ISODate("2014-02-10T10:50:57.240Z") }
+
+
+Sort :
+db.COLLECTION_NAME.find().sort({KEY:1}) # 1 ascending, 2 descending
+db.COLLECTION_NAME.find({},{"title":1,_id:0}).sort({"likes":-1})
+Limit :
+db.COLLECTION_NAME.find({},{"title":1,_id:0}).sort({"likes":-1}).limit(10)
+db.COLLECTION_NAME.find({},{"title":1,_id:0}).sort({"likes":-1}).limit(10).skip(2).pretty();
+
+Remove :
+db.COLLECTION_NAME.deleteMany({'title':'ABCDE'}) 
+db.COLLECTION_NAME.deleteOne({'title':'ABCDE'})
+db.COLLECTION_NAME.remove({}) # remove all stuff
+update :
+db.COLLECTION_NAME.update({'title':'AAAAA'},{$set:{'title':'BBBBBB'}})
+
+Join :
