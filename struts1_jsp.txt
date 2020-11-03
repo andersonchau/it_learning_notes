@@ -1,0 +1,82 @@
+
+<%@ page language="java" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://struts.apache.org/tags-html" prefix="html"%>
+<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
+<%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic"%>
+<%@ taglib uri="http://sem.kaishing.com/tags-lec" prefix="lec"%>
+
+<logic:equal name="FormClassName" property="status" value="<%=String.valueOf(ClassName.STATIC_VALUE) %>">
+	Include this part 
+</logic:equal>
+
+<logic:equal name="FormClassName" property="status" value="1">
+    Include this part           		
+</logic:equal>
+
+<jsp:include page="./header.jsp" />
+
+<html:errors/>
+
+
+
+<bean:write name="FormClassName" property="memberName" /> // theForm.setMemberName(xxx)
+
+<html:form action="/myActionDo.do" method="post" > 
+<html:hidden name="FormClassName" property="action" />
+
+<logic:notEmpty name="FormClassName" property="attachmentDisplayStr">
+						
+						<a href="javascript:downloadAttachment('1','<bean:write name="FormClassName" property="docObj.recordId" />','<bean:write name="FormClassName" property="attachmentDoc.id" />')" >
+							<bean:write name="FormClassName" property="attachmentDisplayStr" />
+						</a>
+					</logic:notEmpty>
+====================================================================================================
+<% int count=1;%>
+						<tr class="xxxx">
+                      		<th width="20">#</th>
+                      		<th width="746">AAAAA</th>
+                      		<th width="180">BBBB</th>
+                    	</tr>
+                    	<logic:iterate name="FormClassName" property="memberList" id="pli">
+                    	<tr>
+                    		<td><%=count%></td>
+                    		<td><bean:write name="pli" property="name" /></td>
+                    		<td><bean:write name="pli" property="quantity" /></td>
+                    	</tr>
+                    	<% count++; %>
+                    	</logic:iterate>
+====================================================================================================
+ <td><a href="javascript:goSystemMain();" name="main" id="main" class="class">Go Back Main</a></td>
+ function goSystemMain(){
+	window.location = "/prs/main.do"; 
+}
+=====================================================================================================
+request.setAttribute("myInfoList",myInfoList);
+
+myInfo is a Java Class
+Opt 
+having 
+String val;
+String lab;
+
+<html:select name="FormClassName" property="myObject.id" styleClass="styleClass" styleId="styleId">
+						<html:option value="">- 請選擇 -</html:option>
+							<logic:notEmpty name="myInfoList">
+								<html:options collection="myInfoList" property="val" labelProperty="lab" />
+							</logic:notEmpty>
+						</html:select>
+=====================================================================================================
+var pattern = /^\d+.?\d*$/;
+if ( !fb.match(pattern)
+
+<%@ page import="java.util.*" %> 
+=====================================================================================================
+public ActionForward execute(ActionMapping mapping,ActionForm form, HttpServletRequest request, HttpServletResponse response)
+=====================================================================================================
+
+<a href="javascript:submitting('<bean:write name="FormName" property="myId"/>');" class="button_class">提交</a>
+# href in button format
+=====================================================================================================
+<% String errorCodeInString =(String)request.getAttribute("myErrorCode"); %>
+=====================================================================================================
+ <td width="10">&nbsp;</td>
