@@ -61,7 +61,7 @@ String lab;
 
 <html:select name="FormClassName" property="myObject.id" styleClass="styleClass" styleId="styleId">
 						<html:option value="">- 請選擇 -</html:option>
-							<logic:notEmpty name="myInfoList">
+							<logic:notEmpty name="myInfoList"> // ArrayList<Option> myInfoList; for a form. 
 								<html:options collection="myInfoList" property="val" labelProperty="lab" />
 							</logic:notEmpty>
 						</html:select>
@@ -79,4 +79,58 @@ public ActionForward execute(ActionMapping mapping,ActionForm form, HttpServletR
 =====================================================================================================
 <% String errorCodeInString =(String)request.getAttribute("myErrorCode"); %>
 =====================================================================================================
- <td width="10">&nbsp;</td>
+ <td width="10">&nbsp;</td>  # empty space stuff 
+ ======================================================================================================
+ <logic:empty name="FormClassName" property="attachmentFilePath">
+                   		<td class="">上載附加文件</td>
+                  		<td class="">
+                  			<html:file name="FormClassName" property="attachF" /> # attachF import org.apache.struts.upload.FormFile;
+                  		</td>
+                  		<td>
+                 			<button onclick="uploadFile(99);">上載</button>
+                  		</td>
+                  		<td></td>
+                  	</logic:empty>
+ # attachmentFile is of FormFile class. FormFile attachF , which point to the uploaded file
+ # theForm.getAttachmentFile() after the multi-part file submit, the file can be accessed by theForm.getAttachF();
+ # 
+ function uploadFile(fid){
+	var f = document.getElementById("FormClassName");
+	if ( (f.elements["quotation1.quotationFile"].value != "" && fileIdx == '1') ){
+		f.encoding = "multipart/form-data";
+		f.elements["action"].value = 'uploadFile';
+		f.elements["uploadAttachmentIndexStr"].value = fileIdx;
+		f.submit();
+	} 
+}
+
+=======================================================================================================
+<html:radio name="ActionFormClassName" property="javaFieldName" value="3" styleId="">已完成</html:radio>
+=======================================================================================================
+# to define a bean to be used by another struts TAG.
+
+<td>
+					<logic:notEmpty name="MyList">
+					<logic:iterate name="MyList" id="list">
+						<bean:define name="list" property="id" id="optId" type="java.lang.Integer"/>
+						<html:radio name="ActionFormClassName" property="status" value="<%=optId.toString()%>"> 
+							<bean:write name="list" property="label"/>
+						</html:radio>
+					</logic:iterate>
+					</logic:notEmpty>
+				</td>
+=======================================================================================================
+<%int s = 0; %>
+<logic:equal name="list" property="listSize" value ="<%=String.valueOf(s) %>">
+							<logic:equal name="list" property="status" value="<%=String.valueOf(CLASS_NAME.STATIC_VALUE) %>">              
+								<span class="red">	
+							</logic:equal>
+							</logic:equal>
+=======================================================================================================
+ <%number++; %>
+ <% hasBGColor = (!hasBGColor); %>
+ =======================================================================================================
+ 
+ <a href="javascript:goToMain`();" name="" id="" class="button">GO主頁</a>
+ =======================================================================================================
+ 
