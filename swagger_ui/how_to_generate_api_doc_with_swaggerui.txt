@@ -1,0 +1,15 @@
+STEP 1 : 
+(1) Write skeleton code with Spring Boot+Spring Doc to generate openAPI JSON
+ref : https://github.com/andersonchau/ swagger pages and config
+(2a) use a.html and openapi.js to genereate static file 
+
+Reference :
+https://codepen.io/unhurried/pen/OajdKZ
+
+(2b) 
+npm install -g bootprint
+npm install -g bootprint-openapi
+bootprint openapi http://petstore.swagger.io/v2/swagger.json target
+(2c)
+java -jar swagger-codegen-cli.jar generate -i a.json -l java -o ./output
+ref : https://github.com/swagger-api/swagger-codegen
