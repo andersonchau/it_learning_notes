@@ -1,8 +1,0 @@
-Today Objecitve :
-(1) REST API demo with ResponseEntity -- done 
-(2) JWT demo
-(3) change language demo  
-(4) Spring Data demo
-(5) Data Science. 
-(6) Jenkins.
-(7) 
