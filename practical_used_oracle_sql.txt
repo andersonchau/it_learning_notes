@@ -120,3 +120,63 @@ and
    
 # list all table, can use WHERE
 SELECT owner, table_name FROM all_tables;
+
+
+ 1.	
+Invoke SQL*Plus.
+
+ 
+
+ 2.	
+Query V$SESSION supplying the username for the session you want to terminate:
+
+SELECT SID, SERIAL#, STATUS, SERVER
+FROM V$SESSION
+WHERE USERNAME = '<username>'
+
+3.	
+Execute the ALTER SYSTEM command to terminate the session:
+
+ALTER SYSTEM KILL SESSION '<sid, serial#>'
+
+ 
+
+ 4.	
+Query V$SESSION:
+
+SELECT SID, SERIAL#, STATUS, SERVER
+FROM V$SESSION
+WHERE USERNAME = '<username>'
+Move your mouse over this icon to see the image
+
+ 
+
+ 5.	
+After PMON has cleaned up after the session, the row is removed from V$SESSION:
+
+SELECT SID, SERIAL#, STATUS, SERVER
+FROM V$SESSION
+WHERE USERNAME = '<username>'
+Move your mouse over this icon to see the image
+
+=======================================================================================
+#simple table data copy/backup
+create table xyz_new as select * from xyz;
+
+=======================================================================================
+# SQL plus output -> file.
+SET PAGESIZE 0
+SET FEEDBACK OFF
+SET HEAD OFF
+set trimout on;
+set trimspool on;
+SET LINESIZE 4000 
+SET ECHO OFF
+SET SERVEROUTPUT ON
+SPOOL output.txt
+select user_id from users where user_id = 13448493 order by createtime;
+SPOOL OFF # a flush here
+EXIT
+=======================================================================================
+# Run sql script 
+@c:\sql_script\sql_script.txt
