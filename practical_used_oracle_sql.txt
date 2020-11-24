@@ -180,3 +180,4 @@ EXIT
 =======================================================================================
 # Run sql script 
 @c:\sql_script\sql_script.txt
+#make sure txt file, environment and 
