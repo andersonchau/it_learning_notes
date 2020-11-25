@@ -10,6 +10,7 @@ SELECT TRUNC(TO_DATE('22-JAN-03'), 'MONTH') FROM DUAL;
 
 #Compare same month
 SELECT d1,d2 FROM table1 WHERE TRUNC(TO_DATE(d1), 'MONTH') = TRUNC(TO_DATE(d2), 'MONTH');
+order_dt >= TRUNC(SYSDATE) — 365
 
 #last 30 days,count at day start :
 SELECT productid FROM product where purchase_date > trunc(sysdate-30);
@@ -19,10 +20,38 @@ SELECT productid FROM product where purchase_date > trunc(to_date('03/06/2011','
 #next one hour : 
 SELECT TO_CHAR(sysdate+1/24),'hh:mi:ss') FROM DUAL;
 
+#add month:
+SELECT TO_CHAR(ADD_MONTHS(SYSDATE,-50000), 'YYYY AD'),
+TO_CHAR(ADD_MONTHS(SYSDATE,-50000), 'YYYY BC') FROM DUAL;
+
+# change for display
+ALTER SESSION SET NLS_DATE_FORMAT = 'DD-MON-YY HH:MI:SS AM';
+
+
+
+
+DECODE(E1, E2, E3, E4) IF E1 = E2 THEN E3 ELSE E4
+NVL(E1, E2) IF E1 IS NULL THEN E2 ELSE E1
+NVL2(E1, E2, E3) IF E1 IS NULL THEN E3 ELSE E2
+
+
+
 # If first value NULL, use second , for NVL2, if 1->2->3
 SELECT NVL(d1,'no-date') from table1;
 SELECT NVL(d1,d2) from table1;
 SELECT NVL(d1,d2,'nothing') from table1;
+#nvl useful for analytics 
+SELECT AVG(NVL(SALE_PRICE,0)) FROM CUST_ORDER;
+
+# case
+SELECT co.order_nbr, co.cust_nbr,
+CASE WHEN co.expected_ship_dt IS NULL THEN 'NOT YET SCHEDULED'
+WHEN co.expected_ship_dt <= SYSDATE THEN 'SHIPPING DELAYED'
+WHEN co.expected_ship_dt <= SYSDATE + 2 THEN 'SHIPPING SOON'
+ELSE 'BACKORDERED'
+END ship_status
+FROM cust_order co
+WHERE co.ship_dt IS NULL AND co.cancelled_dt IS NULL;
 
 # insert with seq 
 INSERT INTO tbl1 (d1,d2) VALUES (my_seq.nextval,'Hello');
@@ -180,4 +209,97 @@ EXIT
 =======================================================================================
 # Run sql script 
 @c:\sql_script\sql_script.txt
-#make sure txt file, environment and 
+#make sure txt file, environment 
+======================================================================================
+#Paging :
+https://stackoverflow.com/questions/241622/paging-with-oracle
+
+SELECT * FROM
+(
+	SELECT a.*, rownum r__
+	FROM
+	(
+		SELECT * FROM ORDERS WHERE CustomerID LIKE 'A%'
+		ORDER BY OrderDate DESC, ShippingDate DESC
+	) a
+	WHERE rownum < ((pageNumber * pageSize) + 1 )
+)
+WHERE r__ >= (((pageNumber-1) * pageSize) + 1)
+
+
+>= Oracle 12c 
+SELECT *
+FROM user
+ORDER BY first_name
+OFFSET 5 ROWS FETCH NEXT 10 ROWS ONLY;
+========================================================================================
+#Outer join on P table, (+) only appears on one side
+SELECT S.SUPPLIER_ID, S.NAME SUPPLIER_NAME, P.PART_NBR, P.NAME PART_NAME
+FROM SUPPLIER S, PART P
+WHERE P.SUPPLIER_ID (+) = S.SUPPLIER_ID;
+========================================================================================
+SELECT E.LNAME
+FROM EMPLOYEE E
+WHERE E.DEPT_ID =(SELECT DEPT_ID FROM DEPARTMENT WHERE NAME = 'ACCOUNTING');
+======================================================================================
+SELECT E.LNAME
+FROM EMPLOYEE E
+WHERE E.DEPT_ID (+) =
+(SELECT DEPT_ID FROM DEPARTMENT WHERE NAME = 'ACCOUNTING');
+#disallowed , workaround :
+
+SELECT E.LNAME
+FROM EMPLOYEE E,
+(SELECT DEPT_ID FROM DEPARTMENT WHERE NAME = 'ACCOUNTING') V
+WHERE E.DEPT_ID (+) = V.DEPT_ID;
+
+=====================================================================
+# self join example:
+SELECT E.NAME EMPLOYEE, M.NAME MANAGER
+FROM EMPLOYEE E, EMPLOYEE M
+WHERE E.MANAGER_EMP_ID = M.EMP_ID;
+=====================================================================
+# insert + select used together 
+INSERT INTO table2
+(column_name(s))
+SELECT column_name(s)
+FROM table1;
+
+
+
+
+
+
+
+
+============================================================================
+Other examples : 
+
+SELECT sales_emp_id, COUNT(*)
+FROM cust_order
+GROUP BY sales_emp_id
+HAVING COUNT(*) = (SELECT MAX(COUNT(*))
+FROM cust_order
+GROUP BY sales_emp_id);
+
+SELECT fname, lname
+FROM employee
+WHERE dept_id = 3 AND salary >= ALL
+(SELECT salary
+FROM employee
+WHERE dept_id = 3);
+
+#inline view 
+SELECT d.dept_id, d.name, emp_cnt.tot
+FROM department d,
+(SELECT dept_id, COUNT(*) tot
+FROM employee
+GROUP BY dept_id) emp_cnt
+WHERE d.dept_id = emp_cnt.dept_id;
+
+SELECT 'SMALL' name, 0 lower_bound, 999 upper_bound from dual
+UNION ALL
+SELECT 'MEDIUM' name, 1000 lower_bound, 24999 upper_bound from dual
+UNION ALL
+SELECT 'LARGE' name, 25000 lower_bound, 9999999 upper_bound from dual;
+
