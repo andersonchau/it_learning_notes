@@ -1,1 +1,166 @@
+Jenkins -- Udemy notes : 
+# Install as docker :
+====================================================
+docker run \
+  --rm \
+  -u root \
+  -p 8080:8080 \
+  -v jenkins-data:/var/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$HOME":/home \
+  jenkinsci/blueocean
+=====================================================
+# first-time password : 
+docker container ls
+docker exec -it <Docker Container ID> bash
+cat /var/jenkins_home/secrets/initialAdminPassword
+=====================================================
+=====================================================
+=====================================================
+Another way of installation of jenkins 
+Install docker compose :
+* dockerfile is config for a particular image, docker compose is the configuration for a group of docker images  
 # https://phoenixnap.com/kb/install-docker-compose-on-ubuntu-20-04
+sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+#Download the Latest Docker Version
+sudo chmod +x /usr/local/bin/docker-compose
+#Change File Permission
+docker–compose –version 
+# check docker-compose version (also as check whether docker-compose is properly installed)
+docker pull jenkins/jenkins , 
+docker images # list all docker images
+docker info | grep -i root # give the folder storing all docker images
+
+=====================================================
+Create Docker Compose for Jenkins 
+in /home/jenkins/jenkins-data/
+nano docker-compose.yml 
+
+version: '3'
+services:
+  jenkins:
+	container_name: jenkins
+	image: jenkins/jenkins
+	ports:
+		- "8080:8080"
+	volumes:
+		- "$PWD/jenkins_home:/var/jenkins_home"
+	networks:
+		- net
+networks:
+  net:
+# make sure <current path>/jenkins_home exists, with proper permission , 
+# id -> 1000 , use chown when necessary . 
+
+docker-compose up -d 
+# run docker-compose.yml and up jenkins services, can use docker ps to check
+# or docker logs -f jenkins for docker jenkins service logs
+
+then can use http://jenkins_ip:8080/ to enter Jenkins GUI
+-> and then basic (plugin/user setup).
+(Optional) docker exec -it jenkins bash
+# enter bash shell of jenkins docker, to exit , type exit
+=============================================================
+Creation of Dummy Job : 
+New Item -> Enter Job Name -> Select "Freestyle Project" -> OK
+Build-> execute shell -> <Enter some linux command> -> Save
+Click Build Now -> Click Build History -> Console Output.
+
+
+Example of shell command : 
+echo "Hello time is $(date)" <-- output of date command 
+NAME=Anderson
+echo "Hello $NAME , time is $(date)" 
+
+==============================================================
+Run a bash script in docker and Triggered by Jenkins 
+Content of script (created in host): 
+#!/bin/bash
+NAME=$1
+LASTNAME=$2
+$SHOW=$3 
+if ["$SHOW" = "true"]; then 
+	echo "Hello $1 $2"
+else
+	echo "Nothing to show"
+fi
+(i) Then copy script in host to docker by :
+docker cp script.sh jenkins:/tmp/script.sh
+
+(ii) In execute shell(in Jenkins UI): 
+General -> This Project is parameterized -> to add parameter name to be used by shell script.
+
+When set, when "Build with Parameters" -> Jenkins will ask for parameters.
+Variations : 
+Choice Parameters : works like options in combo box.
+Boolean Parameter : Boolean parameter
+==============================================================
+A bit of digression , SSH key generation in host machine: 
+ssh-keygen -f remote-key ( with empty password )
+2 files generated.
+remote-key -> private key file
+remote-key.pub -> public key file
+======================================================
+
+Execute job on remote machine through SSH
+1. Use Dockerfile to create remote machine 
+create new folder , create Dockerfile 
+FROM centos:7
+
+RUN yum -y install openssh-server
+RUN useradd remote_user && \ 
+    echo "1234" | passwd remote_user -- stdin && \
+	mkdir /home/remote_user/.ssh && \
+	chmod 700 /home/remote_user/.ssh
+COPY remote-key.pub /home/remote_user/.ssh/authorized_keys
+RUN chown remote_user:remote_user -R /home/remote_user/.ssh/ && \
+	chmod 600 /home/remote_user/.ssh/authorized_keys
+RUN /usr/sbin/sshd-keygen
+CMD /usr/sbin/sshd/ -D 
+=========================================================]
+To Add remote host service for Jenkins to control for demonstration purpose.
+
+in /home/jenkins/jenkins-data/
+nano docker-compose.yml 
+
+version: '3'
+services:
+  jenkins:
+	container_name: jenkins
+	image: jenkins/jenkins
+	ports:
+		- "8080:8080"
+	volumes:
+		- "$PWD/jenkins_home:/var/jenkins_home"
+	networks:
+		- net
+  remote_host:
+	container_name: remote_host
+	image: remote-host
+	build: 
+	  context: centos7 
+	networks:
+	  - net
+networks:
+  net:
+ 
+Run docker-compose build
+then Run docker-compose up -data
+
+Until now, have 
+(1) jenkins docker , 
+(2) centos docker running on the host
+From within the jenkins docker (docker exec -it jenkins bash) 
+run : ssh remote_user@remote_host to connect to remote_host docker 
+( but in this case, ssh client will be asked for password )
+if we change the command to ssh -i remote-key remote_user@remote_host
+with command docker cp remote-key jenkins:/tmp/remote-key
+(why /tmp/remote-key path ?), no password will be asked.
+===========================================================================
+Install Plugin for Jenkins (GUI)
+Manage Jenkins -> Manage Plugins -> Available Tab -> SSH , tick , install without restart
+Restart Jenkins, then can see SSH plugin in "Installed" Tab 
+Then you can use ssh now. 
+
+
+

@@ -265,7 +265,13 @@ INSERT INTO table2
 SELECT column_name(s)
 FROM table1;
 
-
+======================================================================
+# conditionally unique 
+CREATE UNIQUE INDEX email_unique
+    ON table_name( (CASE WHEN active = 1
+                         THEN email
+                         ELSE null
+                      END) );
 
 
 

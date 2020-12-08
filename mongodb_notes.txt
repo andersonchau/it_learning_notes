@@ -11,11 +11,12 @@ commands :
 >db.collection.drop() # drop a table
 
 >use demo # switch db to demo 
+>show collections # list all tables 
 
 RMDBS       MongoDB
 database	database	
 table	collection	
-row	document	
+row		document	
 column	field	
 index	index	索引
 table joins	 	表连接,MongoDB不支持
@@ -69,6 +70,9 @@ db.inventory.find( {
      $or: [ { qty: { $lt: 30 } }, { item: /^p/ } ]
 } ) # SELECT * FROM inventory WHERE status = "A" AND ( qty < 30 OR item LIKE "p%")
 # or use findOne
+
+# projection 
+db.writers.find( { "author": "Gaurav Mandes" }, { _id:0,  author:1, title:1 } )
 =====================================================================================
 Date : 
 > db.test.insert({date: ISODate()}) 
@@ -88,7 +92,108 @@ Remove :
 db.COLLECTION_NAME.deleteMany({'title':'ABCDE'}) 
 db.COLLECTION_NAME.deleteOne({'title':'ABCDE'})
 db.COLLECTION_NAME.remove({}) # remove all stuff
+db.COLLECTION_NAME.remove({"name":"joe"}) # remove all stuff
 update :
 db.COLLECTION_NAME.update({'title':'AAAAA'},{$set:{'title':'BBBBBB'}})
+db.musicians.update({_id: 4},{$set: { instrument: ["Vocals", "Violin", "Octapad"] }})
 
-Join :
+
+
+// create unique index
+db.members.createIndex( { "user_id": 1 }, { unique: true } )
+db.members.createIndex( { "user_id": 1 } ) // just index , improve performance
+
+
+aggregrate 
+
+db.writers.aggregate([{$group : {_id : "$author", TotalBooksWritten : {$sum : 1}}}])
+select count(*) from writers group by AUTHOR;
+
+
+Left Join :
+===============================================================
+SELECT user._id, user.name, sum(order.amount) from user
+LEFT JOIN order on user._id = order.user_id
+<=>
+db.getCollection('user').aggregate([
+   {$lookup:
+      {
+         as: 'orders',
+         from: 'order',
+         localField: "_id",
+         foreignField: "user_id"
+     }
+  }])
+results :
+[
+    {
+        "_id" : 1,
+        "name" : "mlwmlw",
+        "orders" : [ 
+            {
+                "_id" : 1,
+                "user_id" : 1,
+                "amount" : "300"
+            }, 
+            {
+                "_id" : 3,
+                "user_id" : 1,
+                "amount" : 500
+            }
+        ]
+    }....
+]
+===============================================================
+JOIN ON 
+db.userInfo.aggregate([
+ { $lookup:
+     {
+       from: "address", <-- userInfo doc join on address doc 
+       let: { the_city: "$city", the_name: "$name"}, <-- rename address fields , later referenced by $$
+       pipeline: [
+            { $match:
+                { $expr:
+                    { $and:
+                        [
+                           { $gt: [ "$city", "$$the_city"] }, $city is foreign field
+                           { $eq: ["$$the_name", "$contact_name" ] }
+                        ]
+                    }
+                }
+            }
+        ],
+        as: "address" <--- in JSON, join field is address : 
+        }
+ }
+]).pretty();
+
+db.getCollection('user').aggregate([
+   {$lookup:
+      {
+         as: 'orders', 
+         from: 'order',
+         let: { 
+            user_id: "$_id"
+         },
+         pipeline: [{
+            $match: {
+               $expr: {
+                  $eq: [ "$user_id", "$$user_id" ]
+               }
+            },
+         }, {
+           $sort: {"_id": -1}
+         },{
+           $limit: 1
+        }]
+ 
+     }
+  }])
+  
+===============================================================
+
+db.car.findAndModify({
+query: { name: "Alto" },
+sort: { cno: 1 },
+update: { $inc: { speed: 10 } },
+})

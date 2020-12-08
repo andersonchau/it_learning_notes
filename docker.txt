@@ -168,3 +168,47 @@ Docker Swarm
 
 https://mkyong.com/docker/docker-spring-boot-examples/
 online docker tutorial
+===================================================================================================================================
+Dockerfile by example : 
+
+FROM openjdk:10-jre-slim # using which public docker mage
+
+WORKDIR ../project2 # like cd 
+WORKDIR /app  # just like "mkdir" then "cd /app"
+COPY ./target/<your-file>-<version>/SNAPSHOT.jar /app # copy host's executable jar to docker's /app
+EXPOSE 8080
+
+CMD ["java", "-jar", "<your-file>-<version>/SNAPSHOT.jar"] # run jar
+
+RUN is triggered in build step (can have multiple run) , CMD is triggered in launch step(just the last one is executed) 
+
+# -i, --interactive (互動模式)
+# -t, --tty         (配置一個終端機)
+# -d, --detach      (在背景執行)
+===============================================================================================================================
+
+FROM openjdk:8-jdk-alpine
+VOLUME /tmp # create a docker volume, docker see it as /tmp , host see it as /xxxx
+ARG JAR_FILE # pass in as docker command "docker build --build-arg JAR_FILE=target/*.jar -t myorg/myapp ."
+COPY ${JAR_FILE} app.jar # copy host JAR_FILE to docker image
+ENTRYPOINT ["java","-jar","/app.jar"] 
+
+====================================================================================================================================
+docker command list 
+$ docker stop [Container ID]
+$ docker start [Container ID]
+$ docker restart [Container ID]
+# 停止所有的 containers
+$ docker stop $(docker ps -a -q) 
+# 刪除所有的 containers
+$ docker rm $(docker ps -a -q)
+# 刪除所有的 images
+$ docker rmi $(docker images -a -q)
+
+Steps to docker project : 
+(1) write Dockerfile -> use suitable existing public image 
+(2) docker build -t spring-boot-app . #
+(3) docker run -it -p 8080:8080 spring-boot-app # start docker of spring-boot-app 
+====================================================================================================================================
+Simple task: Build a dockerized spring boot app and upload to docker registry and download and redeploy
+(
