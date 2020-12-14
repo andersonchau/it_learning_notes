@@ -1,0 +1,119 @@
+HTML/JS code Reminder :
+========================================================================================================
+<script>	
+		var sys_lang="chi";
+		var nodeId="3224";
+	</script>
+<script>
+	var date = new Date(); // get now date
+	document.write("<script src=\"/web/common/js/breadcrumb_"+sys_lang+".js?date=" + date.getTime() + "\"><\/script>");
+	// same as writing <script> .... </script> in HTML
+	$(function(){
+		loadAJAXData(sys_lang);
+		
+	})
+	//$(function(){// Document is ready});  same as $(document).ready()
+	
+</script>
+========================================================================================================
+To check for a varible that is undefined ( var x , or no this line ) 
+typeof(x) == "undefined"
+
+=========================================================================================================
+
+=========================================================================================================
+AJAX example:
+$.ajax({
+    type: "POST",
+    async: true,   
+    dataType: "json",
+    url: "/xxxx.aspx/function_01",
+    contentType: 'application/json; charset=UTF-8',
+    data: sJson,
+    success: function (msg) {
+        var sResult = msg.d.sResult;
+        var db_Result = msg.d.db_Result;
+        },
+        //statusCode範例
+    statusCode: { 
+            403: function (response) {
+                window.location.href = "redirect.url";
+            }
+        }
+	 error: function (request, status, error) {
+        alert(request.responseText);
+    }
+    }
+});
+=========================================================================================================
+Convert js to data 
+var sJson = JSON.stringify
+({ sCustId: cid, 
+	sActivityId: activitVal
+});
+=========================================================================================================
+if (window.XMLHttpRequest){
+			xhttp = new XMLHttpRequest();
+			xhttp.open("GET", sWebCastXMLFile + "?" + randomnumber, false);
+		} else{
+			xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			xhttp.open("GET", sWebCastXMLFile + "?" + randomnumber, false);
+		}
+
+xhttp.send("");
+		xmlWebCast = xhttp.responseXML;
+		
+or 
+xhttp.onreadystatechange = function() {
+   if (this.readyState == 4 && this.status == 200) {
+       myFunction(this);
+   }
+};
+=========================================================================================================
+
+window.open(url, "_blank", "height="+screen.height+", width="+screen.width+", top=0, left=0, 
+toolbar=no, menubar=no, resizable=no, location=no, status=no,scrollbars=yes");
+
+==========================================================================================================
+FrontEnd js XML parsing :
+<bookstore>
+<book category="cooking"> // bookItems[0].getAttribute("category"); => cooking
+<title lang="en">Everyday Italian</title> 
+<author>Giada De Laurentiis</author>
+<year>2005</year>
+<price>30.00</price>
+</book>
+<book category="children">
+<title lang="en">Harry Potter</title>
+<author>J K. Rowling</author>
+<year>2005</year>
+<price>29.99</price>
+</book>
+........
+</bookstore>
+
+// var x = xmlDoc.getElementsByTagName("title")[0];
+var titleItems = xmlDoc.getElementsByTagName("title");
+for (var i = 0; i < titleItems.length; i ++ ){ // need to check for null for existence 
+    var y = x.childNodes[0];
+    y.nodeValue; // Everyday Italian
+==========================================================================================================
+Peridically do sth : 
+function executeQuery() {
+  $.ajax({
+    url: 'url/path/here',
+    success: function(data) {
+      // do something with the return value here if you like
+    }
+  });
+  setTimeout(executeQuery, 5000); // you could choose not to continue on failure...
+}
+
+$(document).ready(function() {
+  // run the first time; all subsequent calls will take care of themselves
+  setTimeout(executeQuery, 5000);
+})
+or 
+$(function() { ... });
+
+==========================================================================================================

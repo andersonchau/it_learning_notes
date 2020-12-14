@@ -210,5 +210,46 @@ Steps to docker project :
 (2) docker build -t spring-boot-app . #
 (3) docker run -it -p 8080:8080 spring-boot-app # start docker of spring-boot-app 
 ====================================================================================================================================
-Simple task: Build a dockerized spring boot app and upload to docker registry and download and redeploy
-(
+Dockerfile for spring boot
+FROM java:8 
+COPY /build/libs/book-manager-1.0-SNAPSHOT.jar book-manager-1.0-SNAPSHOT.jar
+ENTRYPOINT ["java","-jar","book-manager-1.0-SNAPSHOT.jar"]
+====================================================================================================================================
+ref : https://docs.docker.com/compose/compose-file/
+
+https://docs.docker.com/compose/gettingstarted/
+
+docker-compose up # start application. 
+
+
+docker-compose.yml 
+version: '3'
+services:
+  docker-mysql:
+    restart: always
+    container_name: docker-mysql # specify container name 
+    image: mysql # final tag name 
+    environment: # environment to be input to dockerFile 
+      MYSQL_DATABASE: book_manager
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_HOST: '%'
+    volumes: # -v volume mapping , if want to persist data, need map /var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d
+    ports: # -p port mapping 
+      - "6033:3306"
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=root--execute \"SHOW DATABASES;\""
+      interval: 2s
+      timeout: 20s
+      retries: 10
+  book-manager-app:
+    restart: on-failure
+    build: ./ #Dockerfile location
+    expose:
+      - "10222"
+    ports:
+      - 10222:10222
+    environment: # setup environment variable 
+      WAIT_HOSTS: mysql:3306
+    depends_on: # see above, determine up and shutdown order
+      - docker-mysql
