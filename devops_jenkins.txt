@@ -161,6 +161,67 @@ Install Plugin for Jenkins (GUI)
 Manage Jenkins -> Manage Plugins -> Available Tab -> SSH , tick , install without restart
 Restart Jenkins, then can see SSH plugin in "Installed" Tab 
 Then you can use ssh now. 
+============================================================================
+Pipeline example :
+(has been proved to work in jenkins)
 
+pipeline { 
+
+    agent any 
+    tools { 
+
+        // Install the Maven version configured as "M3" and add it to the path. 
+        maven "M3" 
+        //docker "jenkinsDocker" 
+
+    } 
+
+    stages { 
+
+        stage('Build') { 
+            steps { 
+                // Get some code from a GitHub repository 
+                git 'https://github.com/andersonchau/testing.git' 
+
+                // Run Maven on a Unix agent, not using mvnw
+                sh "mvn clean package" 
+
+                // To run Maven on a Windows agent, use 
+                // bat "mvn -Dmaven.test.failure.ignore=true clean package" 
+            } 
+
+
+            post { 
+                // If Maven was able to run the tests, even if some of the test 
+                // failed, record the test results and archive the jar file. 
+                success { 
+                    junit '**/target/surefire-reports/TEST-*.xml' 
+                    archiveArtifacts 'target/*.jar' 
+                } 
+            } 
+        } 
+
+        stage('Docker image build') { 
+            steps { 
+                    sh 'docker build -t testspringboot:latest .' 
+            } 
+        } 
+
+        stage('Docker Deploy'){ 
+            steps { 
+                //sh 'docker stop testspringbooy
+                //sh 'docker rm testspring boot' 
+
+                sh 'docker run --name devopsexample -d -p 9999:9999 testspringboot:latest --always' 
+            } 
+        } 
+
+         
+
+         
+
+    } 
+
+} 
 
 

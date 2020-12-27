@@ -253,3 +253,25 @@ services:
       WAIT_HOSTS: mysql:3306
     depends_on: # see above, determine up and shutdown order
       - docker-mysql
+====================================================================================================================================
+To customize an existing docker image and save to repository ( not using Dockerfile way)
+docker run -i -t ubuntu:16.04 /bin/bash
+root@dee2cb192c6c:/# apt-get update
+root@dee2cb192c6c:/# apt-get install -y git
+root@dee2cb192c6c:/# exit
+docker diff dee2cb192c6c # this is the container id , not image Id
+docker commit dee2cb192c6c ubuntu_with_git
+
+
+$ docker images
+REPOSITORY TAG IMAGE ID CREATED SIZE
+ubuntu_with_git latest f3d674114fe2 About a minute ago 259.7 MB
+ubuntu 16.04 f49eec89601e 7 days ago 129.5 MB
+====================================================================================================================================
+To customize an existing docker image and save to repository (Dockerfile way), same a above
+Dockerfile : 
+FROM ubuntu:16.04
+RUN apt-get update && \
+apt-get install -y python
+
+$ docker build -t ubuntu_with_python .
