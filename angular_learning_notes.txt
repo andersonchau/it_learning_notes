@@ -392,7 +392,7 @@ myForm: FormGroup;
 
   constructor(private fb: FormBuilder) {
     this.myForm = this.fb.group({
-      password1: ['', [Validators.required,this.patternValidator()]],
+      password1: ['', [Validators.required,this.patternValidator()]], // match fromControlName in html
       password2: ['', Validators.compose([Validators.required, this.patternValidator()])],
     });
     console.log('OK');
@@ -402,7 +402,8 @@ myForm: FormGroup;
   get getFormControls() {
     return this.myForm.controls;
   }
-
+  
+  // this ValidatorFn have signature (Array of Key String OR NULL ) functionName (AbstractControl control )
   patternValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       if (!control.value) {
@@ -412,7 +413,7 @@ myForm: FormGroup;
       //const regex = new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
       //const valid = regex.test(control.value);
       const valid = control.value.length >= 8;
-      return valid ? null : { invalidPassword: true };
+      return valid ? null : { invalidPassword: true }; // match getFormControls.password1.errors?.invalidPassword
     };
   }
 
@@ -420,9 +421,9 @@ myForm: FormGroup;
    console.log('hihi');
     
     
-    /*
-    this.myForm = new FormGroup({
-      name: new FormControl('Benedict'),
+    /* without validator case
+    this.myForm = new FormGroup({ 
+      name: new FormControl('Benedict'), 
       email: new FormControl(''),
       message: new FormControl('')
     });
@@ -437,23 +438,35 @@ myForm: FormGroup;
   }
 ====================================================================================================
 Template driven Form :
+#very good tutorial
+https://codecraft.tv/courses/angular/forms/template-driven/
+template reference variable : https://angular.io/guide/template-reference-variables
 
 
 <form #myForm="ngForm" (ngSubmit)="onSubmitTemplateBased()"> # declare the form object 
         <p> 
             <label>First Name:</label>
             <input type="text"  
-                [(ngModel)]="user.firstName" required>
+                [(ngModel)]="user.firstName" required #firstName="ngModel" >
         </p>
         <p>
             <label>Password:</label>
             <input type="password"  
-                [(ngModel)]="user.password" required>   # map the input to internal datastructure 
+                [(ngModel)]="user.password" required minlength="8" #password="ngModel" >   # ngModel map the input to internal datastructure 
+																							# #password="ngModel" -> local template reference variable 
         </p>
         <p>
-            <button type="submit" [disabled]="!myForm.valid">Submit</button> 
+            <button type="submit" [disabled]="!myForm.valid">Submit</button> # validity is determined by required field 
         </p>
     </form>  
+
+
+<div class="form-control-feedback"
+     *ngIf="password.errors && (password.dirty || password.touched)">
+  <p *ngIf="password.errors.required">Password is required</p>
+  <p *ngIf="password.errors.minlength">Password must contain at least the 8 character</p>
+</div>
+
 
 in TS
 
@@ -473,6 +486,9 @@ export class TemplateDrivenForm {
     }
 
 }
+
+https://angular.io/guide/reactive-forms  <-- check for dynamic form
+https://ithelp.ithome.com.tw/articles/10195280
 ====================================================================================================
 @ViewChild https://angular-2-training-book.rangle.io/advanced-components/access_child_components
 
