@@ -1,0 +1,162 @@
+Thymeleaf learning reminder:
+
+https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#inlining
+
+${} variable
+#{home.welcome} , resource in message 
+@{} URL e.g. <script th:src="@{/resources/js/jquery/jquery.json-2.4.min.js}"
+
+example :
+<a href="details.html" 
+   th:href="@{http://localhost:8080/gtvg/order/details(orderId=${o.id})}">view</a>
+  
+<!-- Will produce '/gtvg/order/3/details' (plus rewriting) -->
+<a href="details.html" th:href="@{/order/{orderId}/details(orderId=${o.id})}">view</a>
+<a th:href="@{${url}(orderId=${o.id})}">view</a>
+<a th:href="@{'/details/'+${user.login}(orderId=${o.id})}">view</a>
+
+<div th:if="${#maps.size(stuReqBean.students[__${rowStat.index}__].score) != 0}">
+*{...} , within th:object
+===================================================================================
+e.g. model object 
+<input type="text" name="userName" value="James Carrot" th:value="${user.name}" />
+${x}/${param.x} req param / ${session.x} session attribute / ${application.x} servlet context attribute
+href:
+<link rel="stylesheet" type="text/css" media="all" href="../../css/gtvg.css" th:href="@{/css/gtvg.css}" />
+
+resource:
+ <p th:text="#{home.welcome}">Welcome to our grocery store!</p>
+with param :
+home.welcome=¡Bienvenido a nuestra tienda de comestibles, {0}!
+<p th:utext="#{home.welcome(${session.user.name})}">
+  Welcome to our grocery store, Sebastian Pepper!
+</p>
+utext means unescaped
+
+<p th:utext="#{${welcomeMsgKey}(${session.user.name})}">  welcomeMsgKey = home.welcome
+  Welcome to our grocery store, Sebastian Pepper!
+</p>
+====================================================================================
+/*
+ * Access to properties using the point (.). Equivalent to calling property getters.
+ */
+${person.father.name}
+
+/*
+ * Access to properties can also be made by using brackets ([]) and writing 
+ * the name of the property as a variable or between single quotes.
+ */
+${person['father']['name']}
+
+/*
+ * If the object is a map, both dot and bracket syntax will be equivalent to 
+ * executing a call on its get(...) method.
+ */
+${countriesByCode.ES}
+${personsByName['Stephen Zucchini'].age}
+
+/*
+ * Indexed access to arrays or collections is also performed with brackets, 
+ * writing the index without quotes.
+ */
+${personsArray[0].name}
+
+/*
+ * Methods can be called, even with arguments.
+ */
+${person.createCompleteName()}
+${person.createCompleteNameWithSeparator('-')}
+====================================================================================
+<p>Hello, [[${session.user.name}]]!</p> inline expression
+<=>
+<p>Hello, <span th:text="${session.user.name}">Sebastian</span>!</p>
+===================================================================================
+<form th:action="@{/handle}">
+<input type="text" th:name="participant"/>  //@RequestParam(value = “participant”).
+<input type="submit"/> 
+</form>
+===================================================================================
+
+<form th:action="@{/handle}">
+    <input type="text" th:name="participant"/>
+    <select th:name="country">
+        <option value="de">Germany</option>
+        <option value="nl">Netherlands</option>
+        <option value="pl">Poland</option>
+        <option value="lv">Latvia</option>
+    </select>
+</form>
+===================================================================================
+<form th:action="@{/handle}">
+    <button type="submit" th:name="action" th:value="in">check-in</button>
+    <button type="submit" th:name="action" th:value="out">check-out</button>
+</form>
+===================================================================================
+<a th:href="@{/index}">
+<a th:href="@{/index(param1='value1',param2='value2')}"> // with param => <a href="/index?param1=value1&m2=value2">
+
+th:href='@{${page.url}(page.page=${item.number},page.size=${page.size})}'
+===================================================================================
+<th:block th:each="userId: ${userIds}">
+    <a th:href="@{/(id=${userId})}"> User [[${userId}]]</a> <br/>
+</th:block>
+===================================================================================
+
+
+<div th:if="${user.isAdmin()} == false">
+<div th:if="${user.isAdmin() == false}">　both works
+<div th:if="${variable.something} == null"> 
+<span th:text="'The name of the user is ' + ${user.name}"> append text
+
+String append
+span th:text="|Welcome to our application, ${user.name}!|">
+<span th:text="'Welcome to our application, ' + ${user.name} + '!'">
+
+<div th:with="isEven=(${prodStat.count} % 2 == 0)"> th:with : define variable isEven 
+<div th:if="${prodStat.count} &gt; 1">
+<span th:text="'Execution mode is ' + ( (${execMode} == 'dev')? 'Development' : 'Production')"> , expression
+<tr th:class="${row.even}? (${row.first}? 'first' : 'even') : 'odd'"> nested expression
+  ...
+</tr>
+
+<p>Age: <span th:text="*{age != null}? *{age} : '(no age specified)'">27</span>.</p> // null check
+<span th:text="*{firstName}?: (*{admin}? 'Admin' : #{default.username})">Sebastian</span>// null check without == null
+
+
+<div th:with="firstPer=${persons[0]}">
+  <p>
+    The name of the first person is <span th:text="${firstPer.name}">Julius Caesar</span>.
+  </p>
+</div>
+
+div th:with="firstPer=${persons[0]},secondPer=${persons[1]}">
+
+
+
+textbox : 
+<input type="checkbox" name="active" th:checked="${user.active}" />
+
+
+PREPROCESSING :
+double bracket
+
+==============================================================================================
+<table>
+  <tr>
+    <th>NAME</th>
+    <th>PRICE</th>
+    <th>IN STOCK</th>
+  </tr>
+  <tr th:each="prod,iterStat : ${prods}" th:class="${iterStat.odd}? 'odd'">
+    <td th:text="${prod.name}">Onions</td>
+    <td th:text="${prod.price}">2.41</td>
+    <td th:text="${prod.inStock}? #{true} : #{false}">yes</td>
+  </tr>
+</table>
+
+==============================================================================================
+class for styling
+
+<div th:class="alert alert-dismissable" th:classAppend="${'alert-' + flashKind}">
+or
+<div th:class="${'alert alert-' + flashKind + ' alert-dismissable'}">

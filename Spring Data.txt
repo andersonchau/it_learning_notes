@@ -39,11 +39,39 @@ Annotation
 @Column(name="TestName",unique = true) // define DB field name in table, unique useful for create constraint when table not exist
 
 One to One relationship : 
+Association type	Default fetch type
+@OneToOne			FetchType.EARGE
+@ManyToOne			FetchType.EARGE
+@OneToMany			FetchType.LAZY
+@ManyToMany			FetchType.LAZY
+
+
 CascadeType.PERSIST	在儲存時一併儲存 被參考的物件。
 CascadeType.MERGE	在合併修改時一併 合併修改被參考的物件。
 CascadeType.REMOVE	在移除時一併移除 被參考的物件。
 CascadeType.REFRESH	在更新時一併更新 被參考的物件。
 CascadeType.ALL	無論儲存、合併、 更新或移除，一併對被參考物件作出對應動作。
+
+
+
+
+public class User {
+    private int     id;
+    private String  name;
+    @ManyToOne
+    @JoinColumn(
+            name = "groupId") // "group_id" the foreign key
+    private Group   group;
+}
+public class Group {
+    private int         id;
+    private String      name;
+    @OneToMany(mappedBy="group") //  the child side's variable name
+    private List<User>  users;
+}
+
+
+
 
 public class User implements Serializable {
  // mappedBy ( at the non-owning(no foreign key) side, meaning relationship is handled by other side) 
@@ -58,6 +86,16 @@ public class Address implements Serializable {
     private User user;
 	
 Typical save operation : 
+========================================================
+User user = new User("John Doe", "john.doe@example.com", "1234abcd"); // unmanaged
+userRepository.save(user);  // managed
+or 
+User user = userRepository.getById(1);
+user.setType("ABC");
+userRepository.save(user);  // or when it is wrapped in a @Transactional , when boundary end, managed enedity can be updated without calling save()
+https://stackoverflow.com/questions/46708063/springboot-jpa-need-no-save-on-transactional	
+================================================================================================================
+
 User user = new User("John Doe", "john.doe@example.com", "1234abcd");
 Address address = new Address("Lake View 321", "Berlin", "Berlin","95781", "DE");
 address.setUser(user); // set child reference
@@ -223,3 +261,50 @@ https://www.jianshu.com/p/69dcb1b85bbb **
 
 JPAQueryFactory
 QueryDslPredicateExecutor<T>
+=================================================================================================
+@Repository 
+-- identify as DAO
+-- as subclass of @Component
+-- translate unchecked SQL exception to Spring Exception.
+=================================================================================================
+consider one-to-many 
+-- one side ( parent )
+-- many side ( child / owner ) 
+
+====================================================================================================
+Points to Note : 
+(1) As a rule of thumb, Always Cascade from Parent side to child side, but bad practice to cascade from child to parent. 
+(2)	@OneToMany(cascade = CascadeType.ALL,mappedBy = "author",orphanRemoval = true) // set orphan removal at parent side 
+
+====================================================================================================
+Joining unrelated entity
+ @OneToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "cocktail_name", 
+       referencedColumnName = "cocktail", 
+       insertable = false, updatable = false, 
+       foreignKey = @javax.persistence
+         .ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+		 
+Query on joining 
+		 entityManager.createQuery("select c from Cocktail c join c.recipe")
+		 new JPAQuery<Cocktail>(entityManager)
+  .from(QCocktail.cocktail)
+  .join(QCocktail.cocktail.recipe)
+====================================================================================================
+@CreationTimestamp //@UpdatTimestamp
+@Temporal(TemporalType.TIMESTAMP) // for different preciseness TIMESTAMP/DATE/... 
+@Column(name = "create_date")
+private Date createDate;
+or @CreateDate /@UpdateDate
+
+====================================================================================================
+@Embedded , subset of fields of a table grouped as object
+@Transient, not a field in DB
+
+Appendix : 
+Checked Exception e.g. ClassNotFoundException, IOException, SQLException
+Java force to be handled. 
+
+Unchecked Exception (unchecked by )e.g. null pointer exception , unchecked by compiler 
+=

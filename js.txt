@@ -29,7 +29,7 @@ $.ajax({
     dataType: "json",
     url: "/xxxx.aspx/function_01",
     contentType: 'application/json; charset=UTF-8',
-    data: sJson,
+    data: sJson
     success: function (msg) {
         var sResult = msg.d.sResult;
         var db_Result = msg.d.db_Result;
@@ -117,3 +117,4 @@ or
 $(function() { ... });
 
 ==========================================================================================================
+

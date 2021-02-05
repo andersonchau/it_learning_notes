@@ -1,0 +1,150 @@
+Some reminder on Angular dev
+Angular CLI : a console tools to manage angular project e.g. 
+Component : perform a particular function. 
+-- Base component for defining the app, others product-list/top-bar
+-- consists of css/html/ts 
+===================================================================================
+
+Installation of CLI :
+npm install -g @angular/cli (with nodejs installed)
+npm install --global @angular/cli@9.0.1 (or specific version)
+ng new my-app <-- create new angular file project structure
+(some variation ng new todo --routing false --style css --skip-git --skip-tests)
+
+===================================================================================
+Component structure : 
+
+/src/app/product-list/product-list.component.ts 
+
+import { Component } from '@angular/core'; // must 
+import { products } from '../products'; // refer to ../products.ts -> product 
+
+// define this component structure 
+@Component({
+  selector: 'app-product-list', // the tag used by others to include this component 
+  templateUrl: './product-list.component.html', // template location file, define the view 
+  styleUrls: ['./product-list.component.css'] // template css file
+})
+/* instead of the file
+@Component({
+  selector: 'app-component-overview',
+  template: `<h1>Hello World!</h1>
+             <p>This template definition spans
+              multiple lines.</p>`
+})
+*/
+
+export class ProductListComponent {
+  products = products;
+
+  share() {
+    window.alert('The product has been shared!');
+  }
+}
+==================================================================================
+//Example data model :
+export class TodoItem {
+	constructor(taskVal: string, completeVal: boolean = false) {
+		this.task = taskVal;
+		this.complete = completeVal;
+	}
+	task: string;
+	complete: boolean;
+}
+
+import { TodoItem } from "./todoItem";
+export class TodoList {
+	constructor(public user: string, private todoItems: TodoItem[] = []) {
+		// no statements required
+	}
+	get items(): readonly TodoItem[] {
+		return this.todoItems;
+	}
+	addItem(task: string) {
+		this.todoItems.push(new TodoItem(task));
+	}
+}
+
+===================================================================================
+/src/app/products.ts
+
+export const products = [
+  {
+    name: 'Phone XL',
+    price: 799,
+    description: 'A large phone with one of the best screens'
+  },
+  {
+    name: 'Phone Mini',
+    price: 699,
+    description: 'A great phone with one of the best cameras'
+  },
+  {
+    name: 'Phone Standard',
+    price: 299,
+    description: ''
+  }
+];
+=======================================================================================
+/app/top-bar/top-bar.component.ts
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-top-bar',
+  templateUrl: './top-bar.component.html',
+  styleUrls: ['./top-bar.component.css']
+})
+
+// Spy on any element to which it is applied.
+// Usage: <div appSpy>...</div>
+@Directive({selector: '[appSpy]'})
+export class TopBarComponent implements OnInit, OnDestroy { // constructor() , ngOnInit() , called when start
+	
+  constructor(private logger: LoggerService) { } // for init class member only
+
+  // implement OnInit's `ngOnInit` method
+  ngOnInit() { this.logIt(`OnInit`); } // hook after init , for doing initialization , sth like onReady() 
+
+  logIt(msg: string) {
+    this.logger.log(`#${nextId++} ${msg}`);
+  }
+	
+  ngOnDestroy() {
+    this.logger.log(`Spy #${this.id} onDestroy`);
+  }
+}
+=======================================================================================
+/app/app.component.html 
+<app-top-bar></app-top-bar> <!-- calling top-bar.component.ts named by selector 
+=======================================================================================
+
+<h3>
+{{ username }}'s To Do List
+<h6>{{ itemCount }} Items</h6>
+</h3>
+========================================================================================
+
+import { Component } from '@angular/core';
+import { TodoList } from "./todoList";
+import { TodoItem } from "./todoItem";
+@Component({
+selector: 'app-root',
+templateUrl: './app.component.html',
+styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+private list = new TodoList("Bob", [
+	new TodoItem("Go for run", true),
+	new TodoItem("Get flowers"),
+	new TodoItem("Collect tickets"),
+]);
+get username(): string {
+	return this.list.user;
+}
+get itemCount(): number {
+// get items()
+	return this.list.items
+		.filter(item => !item.complete).length;
+		// or return this.model.items.filter(function (item) { return !item.complete });
+	}
+}

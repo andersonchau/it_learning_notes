@@ -1,0 +1,223 @@
+Kubernetes :
+-- create , manage cluster ; deploy , update containerized apps. provide high availibity.
+-- do load balancing, monitoring, dashboard 
+
+others :
+-- works on azure, aws
+-- manage applications declaratively, e.g. by YAML, 
+gives the desired state(which container image to use, ports to expose , how many pot replicates)
+
+K8s components :
+
+Controllers :
+
+--Deployments offer scalability and rollback and update 
+--DaemonSets run one instance of a service on every node in the cluster, 
+--StatefulSets are for stateful application components, 
+--CronJobs are for short-lived tasks that need to run at set times
+
+Master (THE Control Panel) 
+-- collection of services
+-- all services can be in single host. production environments, multi-master high availability (HA) is a must have
+e.g. Azure Kubernetes Service (AKS), AWS Elastic Kubernetes Service (EKS), and Google Kubernetes Engine (GKE)
+-- Generally speaking, running 3 or 5 replicated masters in an HA configuration is recommended.
+
+API Server :
+-- all components must go through API server 
+
+Cluster store : etcd , save settings 
+
+Controller Manager : 
+--controller of controllers, meaning it spawns all of the independent control loops and monitors them.
+-- Control loops : 	spawns all of the independent control loops and monitors them,
+to ensure current state => desired state
+
+Scheduler :
+-- check for tasks and assign to health nodes, filter unhealthy nodes, ranks nodes, pick nodes.
+
+cloud controller manager :
+-- integration with AWS, azure , IBM
+
+---------------------------------------------------------------------------------------------------------------
+Nodes (Slave)
+-- watch API server for task assignment 
+-- execute task assignment 
+-- report to API server 
+
+kubelet
+-- do all the listen, handling, reporting to master 
+
+Container runtime (Cri)
+-- hold and handle container operations e.g. docker ,containerd
+
+kube-proxy
+responsible for local cluster networking. For example, it makes sure each node gets its own unique IP address, and implements
+local IPTABLES or IPVS rules to handle routing and load-balancing of traffic on the Pod network.
+
+Kubernetes DNS
+internal DNS service for service location 
+
+Packing app for K8s 
+1. package as container, wrap in a pod , deploy through manifest file 
+
+pods :
+1. pod run one or more containers, each pod has its own IP, containers in a pod shared same IP 
+2. k8s deals with pods , not container, simulate a machine. 
+3. better one container one pod, scaling done by n containers on n pods
+4. pods unreliable, can die. Service ensure the realibity by bringing up and tearing down of pods to ensure availability
+5. service send traffic only to health pods
+
+services  : 
+1. each service has it own IP , will be addressed as https://<dns name>
+
+ConfigMap / Secret : 
+
+
+
+
+https://kubernetes.io/docs/concepts/cluster-administration/proxies/
+
+The kubectl proxy:
+
+runs on a user's desktop or in a pod
+proxies from a localhost address to the Kubernetes apiserver
+client to proxy uses HTTP
+proxy to apiserver uses HTTPS
+locates apiserver
+adds authentication headers
+
+2.apiserver proxy
+is a bastion built into the apiserver
+connects a user outside of the cluster to cluster IPs which otherwise might not be reachable
+runs in the apiserver processes
+client to proxy uses HTTPS (or http if apiserver so configured)
+proxy to target may use HTTP or HTTPS as chosen by proxy using available information
+can be used to reach a Node, Pod, or Service
+does load balancing when used to reach a Service
+
+3	.kube proxy
+runs on each node
+proxies UDP and TCP
+does not understand HTTP
+provides load balancing
+is just used to reach services
+
+４.位于apiserver之前的proxy或者负载均衡器
+existence and implementation varies from cluster to cluster (e.g. nginx)
+sits between all clients and one or more apiservers
+acts as load balancer if there are several apiservers.
+
+５.处理外部的云负载均衡器
+are provided by some cloud providers (e.g. AWS ELB, Google Cloud Load Balancer)
+are created automatically when the Kubernetes service has type LoadBalancer
+use UDP/TCP only
+implementation varies by cloud provider.
+
+pod vs node 
+https://medium.com/developerworld/pod-vs-node-in-kubernetes-26c858988f94
+
+=============================================================================================================================
+
+minikube is a toy implementation of K8s for learning purpose. 
+kubectl is  the client to communicate with k8s.
+
+
+minikube version # check k8s installed 
+minikube start # strts k8s
+
+$ kubectl cluster-info
+Kubernetes master is running at https://172.17.0.29:8443
+KubeDNS is running at https://172.17.0.29:8443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+$ kubectl get nodes
+NAME       STATUS   ROLES    AGE     VERSION
+minikube   Ready    master   3m39s   v1.17.3
+
+
+kubectl create deployment kubernetes-bootcamp --image=gcr.io/google-samples/kubernetes-bootcamp:v1
+# deploy an image , named kubernetes-bootcamp 
+
+kubectl get deployments
+kubectl proxy # starts a proxy to the Kubernetes API server, exposing port from the app
+curl http://localhost:8080/api/ # check to access to the deployed app after proxy is setup
+
+$ kubectl get pods
+NAME                                   READY   STATUS    RESTARTS   AGE
+kubernetes-bootcamp-69fbc6f4cf-26rbc   1/1     Running   0          23m
+
+kubectl describe pods # details of pods
+
+kubectl log <pod_name>
+
+kubectl exec $POD_NAME env # execute container's command env
+
+kubectl exec -ti $POD_NAME bash # enter bash shell of the container
+
+kubectl get - list resources
+kubectl describe - show detailed information about a resource
+kubectl logs - print the logs from a container in a pod
+kubectl exec - execute a command on a container in a pod
+
+==================================================================================
+https://medium.com/swlh/kubernetes-services-simply-visually-explained-2d84e58d70e5
+
+
+Kubernetes services :
+Background : 
+each node has its external IP 
+each node has its internal IP 
+each node has one or more pods
+each pods has internal IP 
+
+pod services are differentiated by port number.
+
+ClusterIP 
+-- a services which has its own internal IP and port number 
+-- allow one pod service to reach/address other pod service, i.e. one pod A no need to know another pod's B IP address.
+pod A only need to know ClusterIP's IP and port and ClusterIP do their own IP/Port translation , allowing load balancing by service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-python 
+spec:
+  ports:
+  - port: 3000 # service's IP 
+    protocol: TCP
+    targetPort: 443 # redirect pods having port number 443
+  selector:
+    run: pod-python  # target pod 
+  type: ClusterIP
+======================================================================================================
+
+NodePort
+--to make the ClusterIP service available from the outside and for this we convert it into a NodePort one
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-python
+spec:
+  ports:
+  - port: 3000 # created NodePort's IP address 
+    protocol: TCP
+    targetPort: 443
+    nodePort: 30080 # nodes' internal IP's port , contrast with external port in LoadBalancer case.
+  selector:
+    run: pod-python
+  type: NodePort
+  
+ ======================================================================================================
+ LoadBalancer similar to NodePort, but it map public node's IP's port to NodePort 
+ thus it can do loadBalancing 
+ 
+ ExternalName : map a DNS name to a pod.
+ 
+ 
+ LoadBalancer --- create --> NodePort ---- create ---> ClusterIP
+ 
+ 
+ ===========================================================================================================
+ kubectl scale deployments/kubernetes-bootcamp --replicas=4 # scale deployment 
+ 
+ 
