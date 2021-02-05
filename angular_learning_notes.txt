@@ -148,3 +148,338 @@ get itemCount(): number {
 		// or return this.model.items.filter(function (item) { return !item.complete });
 	}
 }
+
+===============================================================================================
+Dynamic Style (ngClass and ngStyle)
+
+<button class="btn btn-primary">Button</button>
+equals : 
+
+<button class="btn" 
+        [class.btn-primary]="true" 
+        type="submit">Button
+</button>
+
+<button [ngClass]="['btn', 'btn-primary']">Button</button> 
+<div [ngClass]="isSpecial ? 'special' : ''">This div is special</div> <!-- can embed component variable isSpecial 
+
+// can be multiple 
+
+<button [ngClass]="'btn btn-primary'" 
+        type="submit" 
+        (click)="submit()">
+  Button
+</button>	
+
+<button [ngClass]="calculateClasses()" 
+                        (click)="submit()">Button</button>
+calculateClasses() {
+        return {
+            btn: true,
+            'btn-primary': true,
+            'btn-extra-class': this.stateFlag
+        };
+    }
+	
+<button [ngStyle]="{background: 'red'}">Button</button>
+<button style="background: red">Button</button>
+<button [ngStyle]="calculateStyles()">Button</button>      
+<div [style.font-size]="isSpecial ? 'x-large' : 'smaller'">
+  This div is x-large or smaller.
+</div>
+<div [ngStyle]="currentStyles">
+  This div is initially italic, normal weight, and extra large (24px).
+</div>
+currentStyles: {};
+/* . . . */
+  setCurrentStyles() {
+    // CSS styles: set per current state of component properties
+    this.currentStyles = {
+      'font-style':  this.canSave      ? 'italic' : 'normal',
+      'font-weight': !this.isUnchanged ? 'bold'   : 'normal',
+      'font-size':   this.isSpecial    ? '24px'   : '12px'
+    };
+  }
+  
+===========================================================================
+ngFor example usage
+
+<ul>
+  <li *ngFor="let item of items;let recordIndex = index;let firstRecord = first;let lastRecotd = last; let evenRecord = even; let oddRecord = odd">
+    <label htmlFor="chk_{{item.id}}"> // chk_1234
+      <input id="chk_{{item.id}}" type="checkbox" [checked]="item.done" (click)="itemClick(item)"> 
+      <span [ngClass]="{'done' : item.done, 'text-danger': firstRecord, 'text-warning': lastRecotd, 'bg-info': evenRecord, 'bg-success': oddRecord}">
+        {{ recordIndex }} . {{ item.value }}
+      </span>
+    </label>
+    |
+    <a href="#" (click)="delete(item)">刪除</a>
+    <span *ngIf="item.done">(已完成)</span>
+    </li>
+</ul>
+
+==============================================================================
+Child-parent communication :
+
+<app-colorselector [masterTrial]=clickedNumber (colorChosenRequest)="onJustChoseAColor($event)"></app-colorselector>
+
+masterTrial : child receiver placeholder : in child : @Input('masterTrial') trial: number =0;
+
+clickedNumber : parent's variable 
+
+(colorChosenRequest) child's emitter : in child :  @Output() colorChosenRequest  = new EventEmitter<string>(); this.colorChosenRequest.emit(selected);
+
+onJustChoseAColor($event) , parent's function : 
+onJustChoseAColor(justChosenBall : string ){....}
+
+
+passing array of objects :
+@Input() items: TodoItem[];
+<app-todo-items [items]="todoItems"></app-todo-items>
+
+==============================================================================
+Pipe and custom pipe :
+<p>The hero's birthday is {{ birthday | date }}</p>
+<p>The hero's birthday is {{ birthday | date:"MM/dd/yy" }} </p>
+{{ birthday | date | uppercase}}
+
+xxxx.pipe.ts :
+
+import { Pipe, PipeTransform } from '@angular/core';
+@Pipe({name: 'exponentialStrength'})
+export class ExponentialStrengthPipe implements PipeTransform {
+  transform(value: number, exponent?: number): number {
+    return Math.pow(value, isNaN(exponent) ? 1 : exponent);
+  }
+} 
+usage :
+<p>Super power boost: {{2 | exponentialStrength: 10}}</p>
+==============================================================================
+Custom directive 
+
+import { HostListener, Renderer, ElementRef, Directive, OnInit, Input } from '@angular/core';
+
+@Directive({
+  selector: '[appBsButton]'
+})
+export class BsButtonDirective implements OnInit {
+<button appBsButton="danger" mouseDownClass="primary">Button (Danger <-> Primary)</button>
+<button appBsButton="info" mouseDownClass="success">Button (Info <-> Success)</button>
+
+
+  @Input() appBsButton;
+  @Input() mouseDownClass; // 額外的@Input
+
+  constructor(private el: ElementRef, private renderer: Renderer) { }
+
+  ngOnInit() {
+    this.appBsButton = this.appBsButton || 'primary';
+    this.mouseDownClass = this.mouseDownClass || 'danger';
+    this.renderer.setElementClass(this.el.nativeElement, 'btn', true);
+    this.renderer.setElementClass(this.el.nativeElement, `btn-${this.appBsButton}`, true);
+  }
+
+  @HostListener('mousedown') onMouseDown() {
+    // 移除原來的樣式
+    this.renderer.setElementClass(this.el.nativeElement, `btn-${this.appBsButton}`, false);
+    // 加入mousedown的樣式
+    this.renderer.setElementClass(this.el.nativeElement, `btn-${this.mouseDownClass}`, true);
+  }
+
+  @HostListener('mouseup') onMouseUp() {
+    // 移除mousedown的樣式
+    this.renderer.setElementClass(this.el.nativeElement, `btn-${this.mouseDownClass}`, false);
+    // 加入原來的樣式
+    this.renderer.setElementClass(this.el.nativeElement, `btn-${this.appBsButton}`, true);
+  }
+}
+
+https://www.w3cschool.cn/angular/angular-un1i24nx.html
+===================================================================================================
+component hook
+ngOnChanges - called when an input binding value changes
+ngOnInit - after the first ngOnChanges
+ngDoCheck - after every run of change detection
+ngAfterContentInit - after component content initialized
+ngAfterContentChecked - after every check of component content
+ngAfterViewInit - after component's view(s) are initialized
+ngAfterViewChecked - after every check of a component's view(s)
+ngOnDestroy - just before the component is destroyed
+====================================================================================================
+General Service :
+
+import { TodoItem } from './shared/todo-item';
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root' 
+})
+export class TodoListService {
+．．．．
+｝
+......
+
+ providers: [TodoListService], // 在providers中加入TodoListService. or just  providedIn: 'root'  as above
+ ........
+
+
+import { TodoListService } from './../todo-list.service'; 
+
+export class TodoItemsComponent implements OnInit { 
+  constructor(private todoListService: TodoListService) { } 
+}
+====================================================================================================
+Service with http , Async access 
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ApiClientServiceService {
+
+  constructor(private http: HttpClient) { }
+   ......
+  getEmployeesFormJsonHttpServer() : Observable<Employee[]> {
+      let url = "http://localhost:3000/employees";
+      return this.http.get<Employee[]>(url);
+  }
+  
+}
+
+In component : 
+ constructor(private apiService : ApiClientServiceService ) { }	
+ 
+ ngOnInit(): void {
+    this.loadEmployeeInForTable();
+  }
+  
+   loadEmployeeInForTable(){
+    this.apiService.getEmployeesFormJsonHttpServer()
+              .subscribe(result => this.employees = result );
+  }
+  
+  <tr *ngFor="let employee of employees">
+            <td>{{employee.id}}</td>
+            <td>{{employee.first_name}}</td>
+            <td>{{employee.last_name}}</td>
+            <td>{{employee.email}}</td>
+        </tr>      
+		
+		
+====================================================================================================
+Reactive Form with validator
+
+	
+    <form [formGroup]="myForm" (ngSubmit)="onSubmit(myForm)"> # back by myForm as FormGroup object 
+      <div class="form-group">
+        <label for="password1">Password:</label>
+        <input formControlName="password1" type="password" class="form-control" id="password1" placeholder="Enter Password" name="email">
+        <span class="text-danger"
+        *ngIf="getFormControls.password1.touched && getFormControls.password1.errors?.invalidPassword">
+        Password should have minimum 8 characters
+    </span> 
+      </div>
+      <div class="form-group">
+        <label for="pwd">Password:</label>
+        <input formControlName="password2" type="password" class="form-control" id="password2" placeholder="Retype password" name="pwd">
+      
+    </div>
+      <button type="submit" class="btn btn-default" [disabled]="myForm.invalid">Submit</button> # buttons has attribute disabled when invalid field is set 
+    </form>
+	
+In ts :
+
+myForm: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    this.myForm = this.fb.group({
+      password1: ['', [Validators.required,this.patternValidator()]],
+      password2: ['', Validators.compose([Validators.required, this.patternValidator()])],
+    });
+    console.log('OK');
+  }
+
+
+  get getFormControls() {
+    return this.myForm.controls;
+  }
+
+  patternValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      if (!control.value) {
+        return null;
+      }
+
+      //const regex = new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
+      //const valid = regex.test(control.value);
+      const valid = control.value.length >= 8;
+      return valid ? null : { invalidPassword: true };
+    };
+  }
+
+  ngOnInit(): void {
+   console.log('hihi');
+    
+    
+    /*
+    this.myForm = new FormGroup({
+      name: new FormControl('Benedict'),
+      email: new FormControl(''),
+      message: new FormControl('')
+    });
+    */
+  }
+
+  onSubmit(form: FormGroup) {
+    console.log('Valid?', form.valid); // true or false
+    console.log('Name', form.value.name);
+    console.log('Email', form.value.email);
+    console.log('Message', form.value.message);
+  }
+====================================================================================================
+Template driven Form :
+
+
+<form #myForm="ngForm" (ngSubmit)="onSubmitTemplateBased()"> # declare the form object 
+        <p> 
+            <label>First Name:</label>
+            <input type="text"  
+                [(ngModel)]="user.firstName" required>
+        </p>
+        <p>
+            <label>Password:</label>
+            <input type="password"  
+                [(ngModel)]="user.password" required>   # map the input to internal datastructure 
+        </p>
+        <p>
+            <button type="submit" [disabled]="!myForm.valid">Submit</button> 
+        </p>
+    </form>  
+
+in TS
+
+@Component({
+    selector: "template-driven-form",
+    templateUrl: 'template-driven-form.html'
+})
+export class TemplateDrivenForm {
+
+    user = {
+        firstName: 'John',
+        password:  'test'
+    };
+    
+    onSubmitTemplateBased(user) {
+        console.log(user);
+    }
+
+}
+====================================================================================================
+@ViewChild https://angular-2-training-book.rangle.io/advanced-components/access_child_components
+
+====================================================================================================
+
+====================================================================================================
+
+====================================================================================================
+
+
