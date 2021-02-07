@@ -492,7 +492,106 @@ https://ithelp.ithome.com.tw/articles/10195280
 ====================================================================================================
 @ViewChild https://angular-2-training-book.rangle.io/advanced-components/access_child_components
 
+[1] access child componenet : access public members directly from parent
+
+
+import { Component, ViewChild, AfterViewInit } from '@angular/core';
+
+import { SubComponent } from './component/sub.component';
+
+@Component({
+  selector: 'my-app',
+  templateUrl: './app.component.html',
+  styleUrls: [ './app.component.css' ]
+})
+
+export class AppComponent implements AfterViewInit {
+  @ViewChild(SubComponent) sub: SubComponent;
+
+  ngAfterViewInit() {
+    console.log(this.sub.howAreYou()); 
+    // I am cool
+  }
+}
+
+
+[2] access DOM element directly.
+
+<input #accessId placeholder="Whta's your name?">
+
+import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+
+import { GreetDirective } from './directive/greet.directive';
+
+@Component({
+  selector: 'my-app',
+  templateUrl: './app.component.html',
+  styleUrls: [ './app.component.css' ]
+})
+
+export class AppComponent implements AfterViewInit {
+  @ViewChild('accessId') accessId: ElementRef;
+ 
+  ngAfterViewInit() {
+    this.accessId.nativeElement.value = "Tony Stark";
+  }
+}
+
+[3] Access inner Directive 
+https://www.positronx.io/angular-7-viewchild-access-child-component/
+
+
+import { Directive, ElementRef, Renderer2 } from '@angular/core';
+
+@Directive(
+  { selector: '[appGreet]' }
+)
+
+export class GreetDirective {
+  WhatsUp = 'How Are You?';
+  
+  constructor(elem: ElementRef, renderer: Renderer2) {
+    let greet = renderer.createText('Hello');
+    renderer.appendChild(elem.nativeElement, greet);
+  }
+}
+
+import { Component, ViewChild } from '@angular/core';
+
+import { GreetDirective } from './directive/greet.directive';
+
+@Component({
+  selector: 'my-app',
+  templateUrl: './app.component.html',
+  styleUrls: [ './app.component.css' ]
+})
+
+export class AppComponent {
+  greetMe: string;
+
+  @ViewChild(GreetDirective)
+  
+  set greetApp(dir: GreetDirective) {
+    this.greetMe = dir.WhatsUp
+  };
+
+}
 ====================================================================================================
+Angular Custom directive :
+ng generate directive highlight
+
+<p appHighlight>Highlight me!</p>
+
+import { Directive, ElementRef } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective {
+    constructor(el: ElementRef) {
+       el.nativeElement.style.backgroundColor = 'yellow';
+    }
+}
 
 ====================================================================================================
 
