@@ -38,6 +38,29 @@ Annotation
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Column(name="TestName",unique = true) // define DB field name in table, unique useful for create constraint when table not exist
 
+AUTO-> chose according to DB
+IDENTITY -> BY AUTO INCREMENT
+SEQUENCE -> BY SEQUENCE
+TABLE -> BY TABLE
+
+For MYSQL AUTO_INCREMENT 
+@Id @GeneratedValue(strategy=GenerationType.IDENTITY) == @Id @GeneratedValue(strategy=GenerationType.AUTO)
+
+for Oracle nextval:
+@Id
+@GeneratedValue(strategy=GenerationType.AUTO, generator="my_entity_seq_gen")
+@SequenceGenerator(name="my_entity_seq_gen", sequenceName="MY_ENTITY_SEQ")
+private Long id;
+
+Using talble :
+@TableGenerator(name="TABLE_GENERATOR", table="ID_TABLE", pkColumnName="ID_TABLE_NAME",
+pkColumnValue="PERSON_ID", valueColumnName="ID_TABLE_VALUE")
+@GeneratedValue(strategy = GenerationType.TABLE, generator="TABLE_GENERATOR")
+13
+
+
+
+
 One to One relationship : 
 Association type	Default fetch type
 @OneToOne			FetchType.EARGE
@@ -307,4 +330,262 @@ Checked Exception e.g. ClassNotFoundException, IOException, SQLException
 Java force to be handled. 
 
 Unchecked Exception (unchecked by )e.g. null pointer exception , unchecked by compiler 
-=
+======================================================================================================
+Inheritance Strategy :
+(1) Mapped Superclass
+TABLE_BLOGSPOT 
+--id
+--title  
+--page 
+TABLE_BOOK
+--id 
+--title
+--url
+
+@MappedSuperclass
+public abstract class Publication {
+ 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = “id”, updatable = false, nullable = false)
+    protected Long id;
+ 
+    @Column
+    protected String title;
+	.....
+	
+@Entity(name = “Book”)
+public class Book extends Publication {
+ 
+    @Column
+    private int pages;
+ 
+    …
+}
+@Entity(name = “BlogPost”)
+public class BlogPost extends Publication {
+ 
+    @Column
+    private String url;
+ 
+    …
+}
+
+
+properties : 
+Publication is not an Entity 
+
+you can’t use polymorphic queries that select all Publication entities 
+and you also can’t define a relationship between an Author entity and all Publications.
+You either need to use uni-directional relationship from the Publication to the Author entity,
+ or you have to define a relationship between an Author and each kind of Publication.
+
+you can’t use the inheritance structure for polymorphic queries or to define relationships
+
+=============================================================================================
+Table per class 
+
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public abstract class Publication {
+ 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = “id”, updatable = false, nullable = false)
+    protected Long id;
+	
+	@ManyToMany
+    @JoinTable(name = “PublicationAuthor”, joinColumns = { @JoinColumn(name = “publicationId”, referencedColumnName = “id”) }, inverseJoinColumns = { @JoinColumn(name = “authorId”, referencedColumnName = “id”) })
+    private Set authors = new HashSet();
+	
+	....
+	
+@Entity(name = “Book”)
+public class Book extends Publication {
+ 
+    @Column
+    private int pages;
+ 
+    …
+}
+@Entity(name = “BlogPost”)
+public class BlogPost extends Publication {
+ 
+    @Column
+    private String url;
+ 
+    …
+}
+
+ 
+Publication is an Entity : 
+The superclass is now also an entity and you can, therefore, use it to define a relationship between the Author and
+the Publication entity. This allows you to call the getPublications() method to get all Publications written by that Author. 
+Hibernate will map each Publication to its specific subclass.
+
+List authors= em.createQuery(“SELECT a FROM Author a”, Author.class).getResultList();
+for (Author a : authors) {
+    for (Publication p : a.getPublications()) {
+        if (p instanceof Book)
+        log(p.getTitle(), “book”);
+        else
+        log(p.getTitle(), “blog post”);
+ }
+ 
+ ========================================================================================
+ Single Table :
+ 
+ TABLE_PUBLICATION  
+--id
+-- publication_type varchar
+--title  (nullable) 
+--page 
+-- url (nullable)
+ @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = “Publication_Type”)
+public abstract class Publication {
+ 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = “id”, updatable = false, nullable = false)
+    protected Long id;
+ 
+    @Column
+    protected String title;
+ 
+    @Version
+    @Column(name = “version”)
+    private int version;
+ 
+    @ManyToMany
+    @JoinTable(name = “PublicationAuthor”, joinColumns = { @JoinColumn(name = “publicationId”, referencedColumnName = “id”) }, inverseJoinColumns = { @JoinColumn(name = “authorId”, referencedColumnName = “id”) })
+    private Set authors = new HashSet();
+ 
+    @Column
+    @Temporal(TemporalType.DATE)
+    private Date publishingDate;
+ 
+    …
+}
+
+@Entity(name = “Book”)
+@DiscriminatorValue(“Book”)
+public class Book extends Publication {
+ 
+    @Column
+    private int pages;
+ 
+    …
+}
+
+@Entity(name = “BlogPost”)
+@DiscriminatorValue(“Blog”)
+public class BlogPost extends Publication {
+ 
+    @Column
+    private String url;
+ 
+    …
+}
+
+
+Joined
+
+TABLE_PUBLICATION
+id
+publishing_date
+
+
+TABLE_BOOK
+id (PK FK)
+title
+TABLE_BLOGSPOT
+id(PK_FK)
+url
+
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Publication {
+ 
+        @Id
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        @Column(name = “id”, updatable = false, nullable = false)
+        protected Long id;
+		
+@Entity(name = “Book”)
+public class Book extends Publication {
+ 
+    @Column
+    private int pages;
+ 
+    …
+}
+
+
+@Entity(name = “BlogPost”)
+public class BlogPost extends Publication {
+ 
+    @Column
+    private String url;
+ 
+    …
+}
+
+best performance and need ploymorphic queries -> single table , but may have data inconsistency
+if data inconsistency important need, ploymorphic query and relationship -> join 
+dont need ploymorphic query and relationship -> table per class.
+
+polymorphic query : 
+from Cat as cat
+returns instances not only of Cat, but also of subclasses like DomesticCat
+
+
+
+List<Employee> entityAList = em.createQuery("SELECT t FROM Employee t")
+                                     .getResultList();
+									 
+List<Employee> entityAList = em.createQuery("SELECT t FROM ContractEmployee t")
+                                     .getResultList();
+									 
+ private static List<Employee> createEmployees() {
+      List<Employee> list = new ArrayList<>();
+      FullTimeEmployee e = new FullTimeEmployee();
+      e.setName("Sara");
+      e.setSalary(100000);
+      list.add(e);
+
+      e = new FullTimeEmployee();
+      e.setName("Mike");
+      e.setSalary(90000);
+      list.add(e);
+
+      PartTimeEmployee e2 = new PartTimeEmployee();
+      e2.setName("Jon");
+      e2.setWeeklySalary(900);
+      list.add(e2);
+
+      e2 = new PartTimeEmployee();
+      e2.setName("Jackie");
+      e2.setWeeklySalary(1200);
+      list.add(e2);
+
+      ContractEmployee e3 = new ContractEmployee();
+      e3.setName("Tom");
+      e3.setHourlyRate(60);
+      list.add(e3);
+
+      e3 = new ContractEmployee();
+      e3.setName("Aly");
+      e3.setHourlyRate(90);
+      list.add(e3);
+      return list;
+  }
+}
+
+for (Employee employee : createEmployees()) {
+          em.persist(employee);
+      }
+========================================================================================================
+
+JPQL examples : 
