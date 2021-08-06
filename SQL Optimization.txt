@@ -1,0 +1,39 @@
+General SQL Optimization : 
+(1) restrict result and fields number 
+(2) use views and store procedures. 
+(3) use alternative way instead of SELECT COUNT(*) / constraints instead of trigger
+(4) table variable instead of temp table. 
+(5) avoid HAVING / DISTINCT / UNION ALL instead of UNION when possible 
+
+MERGE usage : avoid duplicate. 
+ merge into student a
+    using (select id, name, score
+       from student_n) b
+    on (a.id = b.id)     
+    when matched then
+      update set a.name = b.name
+           , a.score = b.score
+    when not matched then
+     insert (a.id, a.name, a.score)
+     values (b.id, b.name, b.score);
+
+=======================================================================================
+
+
+
+Indexing (Extra data structure to do the sorting)
+-- Index using B-Tree(searching : O(log N)), A balanced binary tree for sorting indexed field(s). 
+-- Primary key is always indexed by default.
+-- In multiple index case, the B-Tree first sorted by primary index , then secondary index.
+-- Developer be in better position to 
+
+Execution Plan can view SQL execution :
+-- Index unique scan : e.g. WHERE pk_id = 3
+-- Full table scan : e.g. WHERE on non-indexed fields
+-- Index Range scan :  e.g. First indexed search 
+-- Table access by index row Id : Retrieve row data 
+
+Why Index may be desirable :
+-- Update/DELETE needs update B-Tree => overhead
+
+

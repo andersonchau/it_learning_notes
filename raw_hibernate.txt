@@ -1,0 +1,181 @@
+Entity State:
+(1) Transient : object not a row in DB, not managed by Hibernate, not attached to Session 	
+e.g. Person a = new Person(); <--- in Transient State. 
+
+(2) Persistent : associated with a unique session object , 
+API retrieved from DB or after persist()/persist()/saveOrUpdate() 
+
+(3) detached : after sesson close, evict() 
+
+-- When object in persistent state , no need to call save(), when transaction done => auto flush data to DB.
+
+=========================================
+** void persist() **
+
+Person person = new Person();
+person.setName("John");
+session.persist(person);
+ // persist() => convert an object from transient state to persistent state , but not saved to DB
+//  INSERT statements will occur only upon commiting the transaction, flushing or closing the session.
+**The specification for the persist method allows the implementation to issue statements for
+ generating id on commit or flush, and the id is not guaranteed to be non-null after calling this method, 
+ so you should not rely upon it.
+
+Person person = new Person(); // transient 
+person.setName("John");
+session.persist(person);  // persistent 
+session.evict(person); // detached
+session.persist(person); // PersistenceException!
+
+
+** Long save() ** 
+Person person = new Person();
+person.setName("John");
+Long id1 = (Long) session.save(person);
+
+session.evict(person);
+Long id2 = (Long) session.save(person); // duplicated record with another id 
+
+persist vs save :
+persist does not return id, not gurantee to INSERT immediately , but guaranteed to INSERT at session/transaction boundary, 
+save() immediately INSERT and return Id.
+note: 
+INSERT =/= FLUSH
+FLUSH =/= commit , 
+
+
+=================================================================================================================
+** merge() **
+to update a ** persistent ** entity instance with new field values from a ** detached ** entity instance
+
+Object equality , assume same session : 
+ 
+User u1 = findbyId(1);
+User u2 = findbyId(1);
+if ( u1 == u2 ){ // TRUE , but if different session =/= and !equals() 
+}
+
+if you have to compare 2 objects from different session -> override hash() and equals() : 
+ref : https://howtodoinjava.com/hibernate/hibernate-entities-equality-and-identity/
+
+Regarding association : 
+
+Session sessionOne = HibernateUtil.getSessionFactory().openSession();
+      sessionOne.beginTransaction();
+ 
+      // Create new Employee object
+      EmployeeEntity emp = new EmployeeEntity();
+      emp.setFirstName("Lokesh");
+      emp.setLastName("Gupta");
+ 
+      // Create new Employee object
+      AccountEntity acc = new AccountEntity();
+      acc.setAccountNumber("DUMMY_ACCOUNT");
+      emp.setAccount(acc);
+      //acc.setEmployee(emp);
+ 
+      sessionOne.save(acc);
+      sessionOne.save(emp);
+      sessionOne.getTransaction().commit();
+======================================================================================================================
+HQL example :
+
+Query query=session.createQuery("update Employee set age=:age where name=:name");
+query.setInteger("age", 32);
+query.setString("name", "Lokesh Gupta");
+
+Query query=session.createQuery("delete from Account where acctStatus=:status");
+query.setString("acctStatus", "PURGED");
+
+Query query=session.createQuery("insert into purged_accounts(id, code, status) "+
+    "select id, code, status from account where accStatus=:status");
+query.setString("accStatus", "PURGED");
+
+[SELECT [DISTINCT] property [, ...]]
+   FROM path [[AS] alias] [, ...] [FETCH ALL PROPERTIES]
+   WHERE logicalExpression
+   GROUP BY property [, ...]
+   HAVING logicalExpression
+   ORDER BY property [ASC | DESC] [, ...]
+   
+ // 1
+from Account FETCH ALL PROPERTIES
+// 2
+Select a.id, a.name, a.status from Account a order by a.id
+// 3 	
+Select a.id, a.name, a.status from Account a where a.id > 100
+
+String hql = "from Product where price > :price";
+Query query = session.createQuery(hql);
+query.setDouble("price",25.0);
+
+
+SELECT E.firstName FROM Employee E
+FROM Employee E WHERE E.id > 10 ORDER BY E.salary DESC
+SELECT SUM(E.salary), E.firtName FROM Employee E GROUP BY E.firstName
+
+HQL get :
+Employee emp = (Employee) session.get(Employee.class, new Long(2));
+
+
+===================================================================================
+
+HQL :
+select e from Employee e inner join e.team // need to have association in Entity level. 
+
+select e.name, a.city from Employee e INNER JOIN e.address a
+from A as table_a , B as table_b where table_a.c = table_b.c // without association. 
+<-- use cross join , before HB5.1 no "ON" , low performance
+
+Criteria :
+
+Criteria criteria = session.createCriteria(User.class);
+criteria.add(Restrictions.gt("age", new Integer(20)));
+criteria.add(Restrictions.lt("age", new Integer(40)));
+criteria.setFirstResult(51); // start from 51th result 
+criteria.setMaxResults(50); // each page is 50 results
+criteria.add(Restrictions.sqlRestriction(
+              "{alias}.name LIKE (?)", "cater%", Hibernate.STRING)); // SQL type restriction. 
+Type[] types = {Hibernate.INTEGER, Hibernate.INTEGER};
+criteria.add(Restrictions.sqlRestriction(
+               "{alias}.age BETWEEN (?) AND (?)", ages, types));
+			   
+
+criteria.setProjection(Projections.avg("age"));
+Hibernate: select avg(this_.age) as y0_ from T_USER this_
+
+
+List users = criteria.list();
+
+// nested criteria 
+criteria.add(Restrictions.or(
+                   Restrictions.eq("age", new Integer(20)),
+                   Restrictions.isNull("age")
+               ));
+			   
+// use object as search criteria 
+User user = new User();
+user.setAge(new Integer(30));
+
+Criteria criteria = session.createCriteria(User.class);
+criteria.add(Example.create(user));
+
+Tuple postViewCount = entityManager.createQuery(
+    "select p as post, count(pv) as page_views " +
+    "from Post p " +
+    "left join PageView pv on p.slug = pv.slug " +
+    "where p.title = :title " +
+    "group by p", Tuple.class)
+.setParameter("title", "Presentations")
+.getSingleResult();
+
+
+String query_findByProductDepartmentHospital = "select location from ProductInstallLocation location "
+            + " join location.product prod " + " join location.department dep "
+            + " join location.department.hospital hos " + " where  prod.name = :product "
+            + " and dep.name.name = :department " + " and hos.name = :hospital ";
+
+// 
+select from TableAObj where TableAOb.someCol = ? 
+and TableAObj.TableBObj.TableCObj.someCol = ?
+
