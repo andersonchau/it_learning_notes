@@ -1,0 +1,101 @@
+Reference : 
+http://www.ibm.com/support/knowledgecenter/SSFKSJ_7.1.0/com.ibm.mq.doc/sy10660_.htm
+
+Facts and terms : 
+(0) PKI ( private key, public key, certificate )
+-- message encrypted with private key can be decrypted with public key 
+-- message encrypted with public key can be decrypted with private key. 
+-- but practically asym key encryption only used in handshake stage. 
+
+
+(1) Certificate : (ref : https://en.wikipedia.org/wiki/Public_key_certificate)
+-- X509 format used in SSL/TLS : 
+	* Serial Number (Used to uniquely identify the certificate.)
+	* person name  , issuer , valid from /to 
+	* Signature Algorithm 
+	* public key
+	* Digest ( hashing to ensure the integrity of certificate )
+	
+-- Cipher suite 
+SHA256(64bit) {SHA2}¡ASHA384(96bit)¡ASHA512(128bit){SHA2} -- strong cipher 
+SHA0,SHA1,MD5 -- weak chiper.
+
+	
+(2) SSL handshake ( client/server verification, sym key exchange, )
+-- ( agree on protocol to use, 
+	choose cryptographic algorithm, 
+	exchange keys + validate certificate 
+	generate symmetric keys )
+-- CLIENT_HELLO (SSL/TLS version, random number , chipersuite )
+-- SERVER_HELLO (Server certificate, random number ,chosen Chipersuite, CLIENT_CERT_REQ[optional, client can issue no client cert ] ) 
+	* Client verify server certificate
+	* Client send encrypt(random number, server's public key) to server for generating sym key. 
+-- server verify client's certificate ( optional )
+-- CLIENT_FINISH, SERVER_FINISH 
+-- exchange message with sym secret key. 
+
+
+(3) why use symmetric keys instead of asymmetric key
+-- sym key encrypt/decrypt faster 
+-- sym key change every time , higher security. 
+
+(4) Keystore 
+-- kestore is a db file to store secret key(password protected), certificate (the public key)
+-- keystore format PKCS12 (p12)¡@{.net,java,openssl can use}/ jks (only java) (others, p11,jceks,dks,bks{android keystore format})
+-- .cer is certificate file format.  (probably x509)
+-- keystore store certificates used for providing credentials, truststore store certificates to verify secure connections.
+
+(5) certificate management using keystore and keytool  
+-- Creating new keystore 
+	* keytool -keystore clientkeystore -genkey -alias client -storetype PKCS12  
+	( default jks )
+
+-- Import certificate to keystore 
+    * keytool -keystore clientkeystore -certreq -alias client -keyalg rsa -file client.csr
+
+
+-- list all the certificates stored in keystore 
+    * keytool -list -v -keystore selfsigned.jks
+	
+-- export a certificate from keystore to a file 
+	* keytool -export -alias cooldragon -file root.cer -keystore identity.jks
+	
+--  import the certificate you exported into trust.jks 
+	* keytool -import -alias cooldragon -trustcacerts -file root.cer -keystore trust.jks 
+
+
+=================================================================================
+Example : Generate a self signed certificate, and to be trusted by client, using keytool
+// At server side ( generate keys)
+(1) keytool -genkey -keyalg RSA -alias ksAlias -keystore <keystore file> -storepass password -validity 360 -keysize 2048
+// Export 
+(2) keytool -keystore <keystore file> -alias keystoreAlias -export -file certificate.cert
+
+//At client side
+(3)  keytool -keystore <truststore file> -alias <alias> -import -file <certfilename>.cert
+[do not copy the keystore, just copy the cert]
+
+=================================================================================
+Example : Save create an SSL connection to the Paypal with Paypal's certificate. 
+(1) obtain paypal SSL certificate through https://api.sandbox.paypal.com 
+
+(2) import certificate into keystore 
+
+(3a) load custom truststore in code
+ref : http://stackoverflow.com/questions/24555890/using-a-custom-truststore-in-java-as-well-as-the-default-one 
+(good for Android case )
+(3b) jdk\jre\lib\security 
+keytool -list -keystore cacerts
+keytool -keystore cacerts -importcert -alias equifaxsecureca -file Equifax_Secure_Certificate_Authority.cer
+(-import == -importcert )
+(Note : cacerts is a truststore, is used to authenticate peers , where keystore is used to authenticate yourself )
+=============================================================================================
+Example : Add certificate to android truststore. 
+http://blog.antoine.li/2010/10/22/android-trusting-ssl-certificates/
+( note : not to import endpoint certificate )
+or just import cert : 
+https://developer.android.com/training/articles/security-ssl.html
+
+=============================================================================================
+Example : trust all remote certs 
+Ref : http://stackoverflow.com/questions/2642777/trusting-all-certificates-using-httpclient-over-https 
