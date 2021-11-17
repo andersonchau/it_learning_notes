@@ -1,0 +1,34 @@
+Notes on CSS for reminder :
+
+
+ref : 
+https://web.dev/learn/css/selectors/
+
+Basic stuff :
+
+Every thing in CSS is a box (box model) : margin+border+padding+content
+
+
+block(e.g. p/div ) vs inline ( <span>)
+.awesome {}  => <div class="awesome">
+#awesome {}  => <div id="awesome">
+
+<img src="img_girl.jpg"> <!-- image tag with src attribute -->
+
+#something {
+	display:block/inline/none/flex/inline-block...;
+}
+
+block : this is defined as block element 
+inline : as inline 
+none : not shown, not even count dimension , compared with visibility: hidden
+flex : 
+inline-block :
+
+
+https://learnlayout.com/position.html
+
+
+
+
+

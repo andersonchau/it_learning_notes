@@ -1,0 +1,60 @@
+Spring security 5:
+
+ref : 　
+https://mehmetozanguven.github.io/spring-framework/
+
+Notes : 
+
+
+High Level View , the default thing : 
+
+-- HTTP req goes through list of filters before going to Servlet , 
+Spring Security is one of the filter called FilterChainProxy, 
+A FilterChainProxy contains many Filters.
+
+-> filter call AuthenticationManger  ( abstract class ), AM is the glue and logics 
+-> AM calls AuthenticationProviders (How AM select proper AP ? ), 
+-> AP calls UserDetailsServices (UserDetailsServiceImpl find user by userId from credentials (e.g. token/user/pass)), 
+PasswordEncoder checks whether password is correct or not.
+
+-> When failed -> UserDetailsService throws Exception (e.g. UserNotFoundException ) ,
+When success -> store results to SecurityContext object 
+
+In User Application : app can get user name , role and authorities from SecurityContext Object. 
+UserDetails userDetails =
+ (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
+=================================================================================================
+
+Case (1) : most simple , use case : Spring Boot + Basic Spring Login form.
+
+ref : https://spring.io/guides/gs/securing-web/
+(a) Configure system pages login/logout/pages access, assign roles to endpoints in WebSecurityConfig 
+(b) Implements UserDetailsService bean ( custom loadUserByUsername() )
+
+The flow : 
+Spring Form send user+pass to SS
+SS call user implemewnted loadUserByUsername(user) -> and get back User(user,pass,auth) 
+SS (1) match pass (2) perform login , e.g. stuff auths to SecurityContext  
+
+=================================================================================================
+Case (2) : a bit more complicated : need directly access to password from user. 
+ref : https://www.marcobehler.com/guides/spring-security#users-table
+
+(a) implement custom AuthenticationProvider bean , override authenticate() which return overrided Authentication Object. 
+How : Case (1) and (2) differ ? Case (1) not need to access password from user, just username, case (2) app code need to access password from user
+ 
+=================================================================================================
+Case (3) : 
+More complicated : non spring boot case , Spring MVC case. 
+: Custom SS Filter, intercept HTTP request, parser Http request fields ( prob. from AJAX) to get credentials, 
+use case e.g.JWT, 
+
+(1) In WebSecurityConfig insert custom filter before the usernamePasswordFilter 
+addFilterBefore(new CustomLoginAuthenFilter(....), UsernamePasswordAuthenticationFilter.class)
+(2)  XXXXXXProcessingFilter extends AbstractAuthenticationProcessingFilter / Override 
+
+Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+-- parse HTTP req -> UsernamePasswordAuthenticationToken tk
+-- call authenticationManager.authenticate(tk) which in fact call a custom AuthenticationProvier to do authenticate() 
+-- when return a custom AbstractAuthenticationToken , no exception , generate credential and auths and userId thing and return these stuff
+-> success.
