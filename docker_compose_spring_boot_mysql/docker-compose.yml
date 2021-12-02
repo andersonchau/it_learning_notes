@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+    mysqldb:
+        container_name: mysqldb
+        build: ./mysql_docker # user the Dockerfile in ./mysql_docker/ 
+        image: mydb/mysql # 
+        #restart: unless-stopped #
+        env_file: ./.env # .env file defines the variables. 
+        environment:
+            - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+            - MYSQL_DATABASE=$MYSQLDB_DATABASE
+        ports:
+            - $MYSQLDB_HOST_PORT:$MYSQLDB_CONTAINER_PORT
+        volumes:
+            - C:/docker_volume/mysql_db:/var/lib/mysql
+    sb_app: # service name is sb_app
+        container_name: sb_app
+        depends_on:
+            - mysqldb
+        build: ./sb_app_docker # use ./Dockerfile to build image sb_app_img , don't know why 
+                  # context: ./ 
+                  # dockerfile: DockerFile 
+                  # does not work
+                  
+        
+        env_file: ./.env
+        image: sb_app_imge 
+        ports:
+            - $SPRING_HOST_PORT:$SPRING_CONTAINER_PORT 
+  
