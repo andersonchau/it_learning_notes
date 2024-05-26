@@ -5,7 +5,7 @@
 ### Redirect (HTTP 302) 
 - Backend tell frontend to go to another URL
 - Can be set in API endpoint, Apache HTTPD 
-- Used in OAuth2, redirection to 
+- Used in OAuth2, redirecting back to original page in Application 
 
 ### URL Rewriting 
 - purely done in backend 
@@ -21,7 +21,7 @@
 <ol>
   <li>Setup Phase</li>
   <ul>
-	<li>Obtain Client ID, Scope, Client Secret </li>
+	<li>Obtain Client ID, Scope, Client Secret from Authentication providers ( e.g. GOOGLE)</li>
   </ul>
   <li>SSO Login Flow</li>
   <ol>
@@ -35,11 +35,19 @@
     </ol>
 </ol>
 
+### Remote SSH's(SCP) PK Authentication (Useful for CI/CD) 
+1. Trust Remote Servers by putting remote server's PubKey (fingerprint)to my known_hosts files: *ssh-keyscan -H <remote_server_IP> >> ~/.ssh/known_hosts* 
+2. Create Pri-Pub Key pairs (Cmd : *ssh-keygen -t rsa* (generated 2 files: ~/.ssh/id_rsa (private key) and ~/.ssh/id_rsa.pub (public key), then enter passphrase to encrypt the Private Key ) 
+3. Copy Public Key to remote server's authorized_keys files (scp ~/.ssh/id_rsa.pub username@hostName , then cat ~/id_rsa.pub >> ~/.ssh/authorized_keys )
+4. cat public_key_file >> ~/.ssh/authorized_keys 
+5. Then you can access remote server using scp or ssh to run commmand.
+
+
 ### Message Queue 
 
 ### Object storage 
 
-### Remote SSH's Authentication (Useful for CI/CD)
+
 
 
 
