@@ -62,11 +62,16 @@
 - A : all request (read/write) return no-error with result/
 - CP : System not claimed itself to be not available to write request. (e.g. only allow read read request)
 - AP : Every request receives a (non-error) response, without the guarantee that it contains the most recent write.
-- CA : only occurr it is not a distributed system - Single Node.
-f
+- CA : only occurr in a non-distributed system - Single Node.
+
 
 ### CORS 
-
+- A scheme to disallow web page calling external site's resources (including APIs)
+- When access resources, Server generated : Access-Control-Allow-Origin: https://example.com -> JS in webpage (with Origin: https://example.com) is only allowed to access resources.
+- Browser will do checking by comparing  Access-Control-Allow-Origin and Origin, if unmatched -> return 403 
+- Access-Control-Allow-Origin: \* , allow resource to be access from other site
+- Other controlling headers : Access-Control-Request-Method / Access-Control-Request-Headers
+- Extra : Server side should also check the incoming "Origin: xx" header for better security. 
 
 
  
