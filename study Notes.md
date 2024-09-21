@@ -1,15 +1,26 @@
 # IT Learning Notes
 
-# Web Development
+# Web Development and Others
 
 ### Redirect (HTTP 302) 
-- Backend tell frontend to go to another URL
-- Can be set in API endpoint, Apache HTTPD 
+- Backend tell frontend to go to another URL by http 302
+- Can be set in API endpoint or Apache HTTPD 
+```bash
+    # Apache HTTPD Example : match.html redirected rewrite.html
+	RewriteRule ^match\.html$ rewrite.html [NC,L] 
+```
 - Used in OAuth2, redirecting back to original page in Application 
 
 ### URL Rewriting 
-- purely done in backend 
-- can be set in Apache HTTPD, JBOSS
+- Purely done in backend , not noticeable by client
+- can be set in Apache HTTPD, JBOSS, for example : 
+
+```bash
+	# Apache HTTPD Example 
+	Proxypass /healthCheckForAppServer http://<app_server_ip>/appName/api/doHealthCheck
+	ProxypassReverse /healthCheckAppServer http://<app_server_ip>/appName/api/doHealthCheck
+```
+
 
 ### HTTP 401(Forbiddened) vs 403 (UnAuthorized)
 - 401 : Server don't recognize you. Frontend handling : logout, clear cache, back to main page 
@@ -42,12 +53,19 @@
 4. cat public_key_file >> ~/.ssh/authorized_keys 
 5. Then you can access remote server using scp or ssh to run commmand.
 
+### CAP Theorem 
+- C : Consistency, A : Availability , P : Partition Tolerence, CA(dont pratically exist)/AP/CP can exists but not CAP
+- P is a condition, A/P is Goal=> Choose Either AP or CP 
+- "In a distributed data store, at the time of network partition you have to chose either Consistency or Availability and cannot get both"
+- C : Data Consistency for all nodes (all nodes store the recent write)
+- P : communcation between nodes is down (network failure, the Cluster is said to be partitioned). 
+- A : all request (read/write) return no-error with result/
+- CP : System not claimed itself to be not available to write request. (e.g. only allow read read request)
+- AP : Every request receives a (non-error) response, without the guarantee that it contains the most recent write.
+- CA : only occurr it is not a distributed system - Single Node.
+f
 
-### Message Queue 
-
-### Object storage 
-
-
+### CORS 
 
 
 
