@@ -61,7 +61,7 @@
 - P : communcation between nodes is down (network failure, the Cluster is said to be partitioned). 
 - A : all request (read/write) return no-error with result/
 - CP : System not claimed itself to be not available to write request. (e.g. only allow read read request)
-- AP : Every request receives a (non-error) response, without the guarantee that it contains the most recent write.
+- AP : Every request receives a (non-error) response, without the guarantee that it contains the most recent write. SYNC after network recover.
 - CA : only occurr in a non-distributed system - Single Node.
 
 
