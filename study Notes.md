@@ -47,9 +47,9 @@
 </ol>
 
 ### Remote SSH's(SCP) PK Authentication (Useful for CI/CD) 
-1. Trust Remote Servers by putting remote server's fingerprint (short version of public key)to my known_hosts files: *ssh-keyscan -H <remote_server_IP> >> ~/.ssh/known_hosts* 
+1. Trust Remote Servers by putting remote server's fingerprint (short version of public key)to my known_hosts files: *ssh-keyscan -H <remote_server_IP> >> ~/.ssh/known_hosts* ( Purpose : build the trust to remove host here, analogous to inserting SSL cert to truststore) 
 2. Create Pri-Pub Key pairs (Cmd : *ssh-keygen -t rsa* (generated 2 files: ~/.ssh/id_rsa (private key) and ~/.ssh/id_rsa.pub (public key), then enter passphrase to encrypt the Private Key ) 
-3. Copy Public Key to remote server's authorized_keys files (scp ~/.ssh/id_rsa.pub username@hostName , then cat ~/id_rsa.pub >> ~/.ssh/authorized_keys )
+3. Copy Public Key to remote server's authorized_keys files (scp ~/.ssh/id_rsa.pub username@hostName , then cat ~/id_rsa.pub >> ~/.ssh/authorized_keys ) ( Purpose : Let remote server to trust me )
 4. cat public_key_file >> ~/.ssh/authorized_keys 
 5. Then you can access remote server using scp or ssh to run commmand.
 
@@ -73,8 +73,35 @@
 - Other controlling headers : Access-Control-Request-Method / Access-Control-Request-Headers
 - Extra : Server side should also check the incoming "Origin: xx" header for better security. 
 
+### CSRF ( Cross Site Request Forgery )
+- Prevention - CSRF Token : A one-time token sent from server to frontend page (probably containing a FORM ), the form POST back CSRF token
+- To prevent cross-site access by matching server assigned token 
+- e.g. In Spring Security , it can insert hidden field in <input type="hidden" name="_csrf" value="4bfd1575-3ad1-4d21-96c7-4ef2d9f86721"/> 
 
- 
+### XSS Attack by Example : 
+- Inject JS to victims browsers and execute , to steal victims' data 
+- e.g. Phishing Email : https://abc.com/xxx?<Malicious_JS_SCRIPTS> 
+- e.g. Save Malicious JS script to server and load the JS to victims PC.( Prevention method : to escape special characters to prevent HTML injection)
+
+### IT-Product : Queue-IT 
+- Waiting room feature, controlling the ther number of user to enter the protected site per minute (Speed) 
+- QUEUE vs Waiting Room Concept : Can have multiple waiting room (e.g. UAT/DEV/PROD ), but share the same QUEUE. Waiting room as logical queue partition. 
+- Implementation I (Frontend) : Insert QIT JS in frontpage, ask client to goto QIT-waiting room to wait. => Insecure, User can bypass the checking 
+- Implementation II (Backend) : Insert a Interceptor Logic to Public Facing Server. (1) check cookie for QIT token (2) return 302 to Queue Server (3) After waiting -> QIT Server return QIT Token -> 302 back to site  (4) Client present QIT token and enter site. 
+- Queue Outflow (per minutes) : Number user to be allowed to ENTER site. Estimation based on : load test result , bandwidth, How long a typical user stay in the site. 
+
+### IT-Product : WAF F5 
+- Feature : Traffic Learning , block suspicious requests and attacks 
+- IP Whitelisting 
+- Traffic Monitoring 
+- HealthCheck to downstream nodes 
+
+
+
+
+
+
+
 
 
 
