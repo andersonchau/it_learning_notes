@@ -1,0 +1,92 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{blindtext}
+\begin{document}
+
+\section{Foreword}
+Author : Anderson Chau
+\newline 
+Disclaimer : This notes is written only for my own memorization purpose after I have studied online lecture notes and blogs. 
+% ######################################################################
+% ######################################################################
+% ######################################################################
+\section{K-Means Clustering}
+Simple Description : Identify clusters by finding the centroid of data points
+\newline
+\newline
+Algorithm :  
+\newline
+\newline
+1. Initialize \( \mu_1 \),\( \mu_2 \).... \( \mu_k \) randomly (k is hyper-parameter) 
+\newline
+\newline
+2. Repeated until converge : 
+\newline
+\newline
+(i) \( $$c^{(i)} := \arg \min_j ||x^{(i)} - \mu_j||^2$$ , j \in [1:k]\) , (i.e. \(c^{(i)}\) denote which  \( \mu \)  the \(x^{(i)}\) is linked to. Link each data point to nearest  \( \mu_j \). If \( x^{(i)}\) is nearest to \( \mu_s \), then \(c^{(i)} = j\). Thus, k partitions are created.  )
+\newline
+\newline
+(ii) \($$\mu_j := \frac{\sum_{i=1}^m 1\{{c^{(i)} = j}\} x^{(i)}}{\sum_{i=1}^m 1\{{c^{(i)} = j}\}}$$\) , (i.e. For each data point in each partition from (i) , find the new centroid and assign to \(\mu_k\)
+\newline
+\newline 
+Proof of convergence of the algorithm : consider 
+\newline 
+\newline 
+\( $$J(c, \mu) = \sum_{i=1}^m ||x^{(i)} - \mu_{c^{(i)}}||^2$$\)
+\newline 
+Observation : J must be monotonically decreasing. It is because for step (i) It is adjusting \(c^(i)\) to reduce J, for step (ii) we are adjusting  \(\mu_j\) to reduce J
+% ######################################################################
+% ######################################################################
+% ######################################################################
+\section{Linear Regression(MSE approach) }
+\section{Linear Regression(MLE approach) }
+\section{Logistic Regression}
+\section{Logistic Regression(MLE approach)}
+\section{Softmax Regression(Multi-Class Logistic)}
+% ######################################################################
+% ######################################################################
+% ######################################################################
+\section{Loss function in Classification(Binary) Problem - General treatment}
+General Hypothesis : \(h_\theta(x) = x^T \theta\)
+\newline
+\newline
+Adjustment for binary classification : 
+\newline
+\(
+\text{sign}(h_\theta(x)) = \text{sign}(\theta^T x)= \text{sign}(t) = 
+\begin{cases} 
+1 & \text{if } t > 0 \\
+0 & \text{if } t = 0 \\
+-1 & \text{if } t < 0 
+\end{cases}
+\)
+\newline
+\newline
+Measure of confidence :  \(h_\theta(x) = x^T \theta\) gives larger value, more confident  
+\newline
+\newline
+Margin ( \(y x^T \theta\) ) : (i) if \(h_\theta(x)\) classify correctly, margin is positive, otherwise negative.
+\newline
+(ii) Therefore our objective is to maximize the margin ( we want both correct classification and be confident)
+\newline
+\newline
+Consider the following loss function : 
+\[
+J(\theta) = \frac{1}{m} \sum_{i=1}^{m} \phi\left(y^{(i)} \theta^T x^{(i)}\right)
+\]
+
+We want penalize wrong classfication and encourage correct one , we design \(\phi\) as 
+\(
+\phi(z) \to 0 \text{ as } z \to \infty, \quad \text{while} \quad \phi(z) \to \infty \text{ as } z \to -\infty
+\)  where  \(z = yx^{T}\theta\) , and examples are :  
+\newline 
+\newline
+logistic loss : \(\phi_{\text{logistic}}(z) = \log(1 + e^{-z})\) ,used in logistic regression 
+\newline 
+\newline 
+hinge loss : \(\phi_{\text{hinge}}(z) = [1 - z]_+ = \max{1 - z, 0}\), used in SVM
+\newline 
+\newline 
+Exponential loss \(\phi_{\text{exp}}(z) = e^{-z}\), used in boosting 
+
+\end{document}

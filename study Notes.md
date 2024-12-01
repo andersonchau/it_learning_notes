@@ -92,18 +92,8 @@
 
 ### IT-Product : WAF F5 
 - Feature : Traffic Learning , block suspicious requests and attacks 
-- IP Whitelisting 
+- IP Whitelisting / blacklisting 
 - Traffic Monitoring 
-- HealthCheck to downstream nodes 
-
-
-
-
-
-
-
-
-
-
+- HealthCheck to downstream nodes
 
 
