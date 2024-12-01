@@ -6,6 +6,7 @@
 \section{Foreword}
 Author : Anderson Chau
 \newline 
+\newline 
 Disclaimer : This notes is written only for my own memorization purpose after I have studied online lecture notes and blogs. 
 % ######################################################################
 % ######################################################################
@@ -39,10 +40,69 @@ Observation : J must be monotonically decreasing. It is because for step (i) It 
 % ######################################################################
 % ######################################################################
 \section{Linear Regression(MSE approach) }
+Hypothesis : 
+\[
+h_\theta(x) = \sum_j \theta_j x_j = \theta^\top x
+\]
+We want to minimize MSE (Mean Square Error) 
+\[
+J(\theta) = \frac{1}{2} \sum_i \left( h_\theta(x^{(i)}) - y^{(i)} \right)^2 = \frac{1}{2} \sum_i \left( \theta^\top x^{(i)} - y^{(i)} \right)^2
+\]
+Gradient of J : 
+\[
+\frac{\partial J(\theta)}{\partial \theta_j} = \sum_i x_j^{(i)} \left( h_\theta(x^{(i)}) - y^{(i)} \right)
+\]
+Each \(\theta_j\) is updated for each step by gradient descent algorithm. 
+\[
+\theta_j := \theta_j - \alpha \frac{\partial}{\partial \theta_j} J(\theta)
+\]
+Practically : 
+\newline
+(i) Learning rate \(\alpha\) is hyperparameter and data dependent , larger, fewer steps to get to min. but may miss the minimum. (Monitor the loss curve, J value vs iteration ). 
+\newline
+(ii) Batch GD is slow, may be Mini-Batch GD or Stochastic GD.
+\newline
+(iii) If \(\alpha\) is small but the loss oscillate , converged and stop learning.
+
+
 \section{Linear Regression(MLE approach) }
 \section{Logistic Regression}
+\[P(y=1|x) = h_\theta(x) = \frac{1}{1 + \exp(-\theta^\top x)} \equiv \sigma(\theta^\top x)\]
+\[P(y=0|x) = 1 - P(y=1|x) = 1 - h_\theta(x)\]
+Loss function is 
+\[J(\theta) = -\sum_i \left[ y^{(i)} \log(h_\theta(x^{(i)})) + (1 - y^{(i)}) \log(1 - h_\theta(x^{(i)})) \right]\]
+Again , BGD for following gradient of J : 
+\[\frac{\partial J(\theta)}{\partial \theta_j} = \sum_i x^{(i)}j \left( h\theta(x^{(i)}) - y^{(i)} \right)\]
+Interpertation : For a particular sample : if h return 1/0 and y return 1/0 , the term is 0. if  h return 1/0 and y return 0/1 , the term is positive infinity. 
 \section{Logistic Regression(MLE approach)}
 \section{Softmax Regression(Multi-Class Logistic)}
+k classes, n x k parameters , and the hypothesis is :
+
+\begin{align}
+h_\theta(x) =
+\begin{bmatrix}
+P(y = 1 | x; \theta) \\
+P(y = 2 | x; \theta) \\
+\vdots \\
+P(y = K | x; \theta)
+\end{bmatrix}
+=
+\frac{1}{ \sum_{j=1}^{K}{\exp(\theta^{(j)\top} x) }}
+\begin{bmatrix}
+\exp(\theta^{(1)\top} x ) \\
+\exp(\theta^{(2)\top} x ) \\
+\vdots \\
+\exp(\theta^{(K)\top} x ) \\
+\end{bmatrix}
+\end{align}
+
+Below Loss function  is simple to understand (compare with previous hypothesis)  : we want to maximize the y=k associated probility. 
+\[J(\theta) = -\left[ \sum_{i=1}^m \sum_{k=1}^K 1\{y^{(i)}=k\} \log \left( \frac{\exp(\theta^{(k)\top} x^{(i)})}{\sum_{j=1}^K \exp(\theta^{(j)\top} x^{(i)})} \right) \right]\]
+Gradient of J is, we solve the problem by  GD : 
+\[\nabla_{\theta^{(k)}} J(\theta) = -\sum_{i=1}^m \left[ x^{(i)} \left( 1\{y^{(i)}=k\} - P(y^{(i)}=k|x^{(i)};\theta) \right) \right]\]
+Where : 
+\[P(y^{(i)}=k|x^{(i)};\theta) = \frac{\exp(\theta^{(k)\top} x^{(i)})}{\sum_{j=1}^K \exp(\theta^{(j)\top} x^{(i)})}\]
+
 % ######################################################################
 % ######################################################################
 % ######################################################################
