@@ -148,5 +148,16 @@ hinge loss : \(\phi_{\text{hinge}}(z) = [1 - z]_+ = \max{1 - z, 0}\), used in SV
 \newline 
 \newline 
 Exponential loss \(\phi_{\text{exp}}(z) = e^{-z}\), used in boosting 
+\section{Kernel}
+(I) To x map from lower higher dimension. Useful when data are non-linearly separable(Transform to a curve) 
+\newline
+(II) Computation complexity not necessarily increase proportionately.
+\newline
+(III) Example : a mapping function \(\varphi : R \to R^{4}\) , \(x \to [1,x,x^{2},x^{3}]\), and h is \(\theta^{T}x\) having  \(\theta  = [\theta_1,\theta_2,\theta_3,\theta_4]\) 
+\newline
+(IV) x is called attribute, \(x \to [1,x,x^{2},x^{3}]\) called feature, \(\varphi\) feature map
+\newline
+(IV) Another Example : a mapping function \(\varphi : R \to R^{1000}\) , \(x \to [1,x_1,x_1^{2},x_1^{3},x_1 x_2,x_1 x_2^{2} .... ]\)
 
+ 
 \end{document}
