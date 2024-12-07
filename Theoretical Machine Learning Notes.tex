@@ -36,6 +36,8 @@ Proof of convergence of the algorithm : consider
 \( $$J(c, \mu) = \sum_{i=1}^m ||x^{(i)} - \mu_{c^{(i)}}||^2$$\)
 \newline 
 Observation : J must be monotonically decreasing. It is because for step (i) It is adjusting \(c^(i)\) to reduce J, for step (ii) we are adjusting  \(\mu_j\) to reduce J
+\newline 
+J is non-convext, it may get to local minimum. To try several random initial values, and choose the lowest J.
 % ######################################################################
 % ######################################################################
 % ######################################################################
@@ -73,7 +75,7 @@ Loss function is
 \[J(\theta) = -\sum_i \left[ y^{(i)} \log(h_\theta(x^{(i)})) + (1 - y^{(i)}) \log(1 - h_\theta(x^{(i)})) \right]\]
 Again , BGD for following gradient of J : 
 \[\frac{\partial J(\theta)}{\partial \theta_j} = \sum_i x^{(i)}j \left( h\theta(x^{(i)}) - y^{(i)} \right)\]
-Interpertation : For a particular sample : if h return 1/0 and y return 1/0 , the term is 0. if  h return 1/0 and y return 0/1 , the term is positive infinity. 
+Interpretation : For a particular sample : if h return 1/0 and y return 1/0 , the term is 0. if  h return 1/0 and y return 0/1 , the term is positive infinity. 
 \section{Logistic Regression(MLE approach)}
 \section{Softmax Regression(Multi-Class Logistic)}
 k classes, n x k parameters , and the hypothesis is :
@@ -96,15 +98,17 @@ P(y = K | x; \theta)
 \end{bmatrix}
 \end{align}
 
-Below Loss function  is simple to understand (compare with previous hypothesis)  : we want to maximize the y=k associated probility. 
+Below Loss function  is simple to understand : By referencing to previous hpothesis, we want to maximize the y=k associated probility. 
 \[J(\theta) = -\left[ \sum_{i=1}^m \sum_{k=1}^K 1\{y^{(i)}=k\} \log \left( \frac{\exp(\theta^{(k)\top} x^{(i)})}{\sum_{j=1}^K \exp(\theta^{(j)\top} x^{(i)})} \right) \right]\]
 Gradient of J is, we solve the problem by  GD : 
 \[\nabla_{\theta^{(k)}} J(\theta) = -\sum_{i=1}^m \left[ x^{(i)} \left( 1\{y^{(i)}=k\} - P(y^{(i)}=k|x^{(i)};\theta) \right) \right]\]
 Where : 
 \[P(y^{(i)}=k|x^{(i)};\theta) = \frac{\exp(\theta^{(k)\top} x^{(i)})}{\sum_{j=1}^K \exp(\theta^{(j)\top} x^{(i)})}\]
 
+
 % ######################################################################
-% ######################################################################
+\section{BGD variation : Mini BGD/SGD}
+BGD use all training data in a single step, which is exteremely costly.
 % ######################################################################
 \section{Loss function in Classification(Binary) Problem - General treatment}
 General Hypothesis : \(h_\theta(x) = x^T \theta\)
@@ -148,16 +152,35 @@ hinge loss : \(\phi_{\text{hinge}}(z) = [1 - z]_+ = \max{1 - z, 0}\), used in SV
 \newline 
 \newline 
 Exponential loss \(\phi_{\text{exp}}(z) = e^{-z}\), used in boosting 
-\section{Kernel}
-(I) To x map from lower higher dimension. Useful when data are non-linearly separable(Transform to a curve) 
+\section{Kernel Mapping}
+(I) Purpose : To x map from lower higher dimension. Useful when data are non-linearly separable(Transform to a curve) 
 \newline
-(II) Computation complexity not necessarily increase proportionately.
+(II) Computation complexity does not necessarily increase proportionately.
 \newline
 (III) Example : a mapping function \(\varphi : R \to R^{4}\) , \(x \to [1,x,x^{2},x^{3}]\), and h is \(\theta^{T}x\) having  \(\theta  = [\theta_1,\theta_2,\theta_3,\theta_4]\) 
 \newline
-(IV) x is called attribute, \(x \to [1,x,x^{2},x^{3}]\) called feature, \(\varphi\) feature map
+(IV) Terms : x is called attribute, \(x \to [1,x,x^{2},x^{3}]\) called feature, \(\varphi\) feature map, \(\varphi : R^{1} \to R^{4}\) in this case. d =1 p = 4 
 \newline
-(IV) Another Example : a mapping function \(\varphi : R \to R^{1000}\) , \(x \to [1,x_1,x_1^{2},x_1^{3},x_1 x_2,x_1 x_2^{2} .... ]\)
+(IV) Another Example : a mapping function \(\varphi : R^{3} \to R^{1000}\) , \(x \to [1,x_1,x_1^{2},x_1^{3},x_1 x_2,x_1 x_2^{2} .... ]\) (*) ,let d  = 3 , p =1000. If we exhaust all possibilities, then p = 1 + d + \(d^2\) + \(d^3\)  (**) 
+\newline
+Recall GD stepping : 
+\[\theta := \theta + \alpha \sum_{i=1}^{n} (y^{(i)} - h_{\theta}(x^{(i)}))x^{(i)}\]
+\[\theta := \theta + \alpha \sum_{i=1}^{n} (y^{(i)} - \theta^Tx^{(i)})x^{(i)}\]
+Putting kernel mapping to the equation :
+\[\theta := \theta + \alpha \sum_{i=1}^{n} (y^{(i)} - \theta^T\phi(x^{(i)}))\phi(x^{(i)})\]
 
- 
+We pause here to evaluate the cost of computing each of update (Curse of Demensionality...), considering (**). If we just use the kernel direction, we suffer the curse of demensionality : Suppose d (data dimension) = 1000, then by using the mapping in (**) we have p = \(10^9\). \(\theta^T\phi(x^{(i)})\) need O(p) (dot product ) , and O(np) for summing up all data in each step.
+\newline
+Going back to BGD.
+\[\theta := \theta + \alpha \sum_{i=1}^{n} (y^{(i)} - \theta^T\phi(x^{(i)}))\phi(x^{(i)})\]
+, assuming 
+\(\theta = \sum_{i=1}^{n} \beta_i \phi(x^{(i)})\) at some point, with initialization \(\theta = 0 = \beta \)
+\newline 
+It becomes 
+\[\theta := \sum_{i=1}^{n} \beta_i \phi(x^{(i)}) + \alpha \sum_{i=1}^{n} (y^{(i)} - \theta^T\phi(x^{(i)}))\phi(x^{(i)})\] 
+Rearranging : 
+\[\theta := \sum_{i=1}^{n} (\beta_i + \alpha  (y^{(i)} - \theta^T\phi(x^{(i)})))\phi(x^{(i)})\] 
+Therefore it is equivalent to updating \(\beta_i\) instead of \(\theta_i\) by 
+\[\beta_i := \beta_i + \alpha  (y^{(i)} - \theta^T\phi(x^{(i)}))\]
+\[ \beta_i := \beta_i + \alpha \left( y^{(i)} - \sum_{j=1}^{n} \beta_j \phi(x^{(j)})^T \phi(x^{(i)}) \right)\]
 \end{document}
