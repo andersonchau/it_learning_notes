@@ -152,7 +152,7 @@ hinge loss : \(\phi_{\text{hinge}}(z) = [1 - z]_+ = \max{1 - z, 0}\), used in SV
 \newline 
 \newline 
 Exponential loss \(\phi_{\text{exp}}(z) = e^{-z}\), used in boosting 
-\section{Kernel Mapping}
+\section{Kernel Mapping (Special case demo by Linear Regression + Polymoninal Kernel)}
 (I) Purpose : To x map from lower higher dimension. Useful when data are non-linearly separable(Transform to a curve) 
 \newline
 (II) Computation complexity does not necessarily increase proportionately.
@@ -163,7 +163,7 @@ Exponential loss \(\phi_{\text{exp}}(z) = e^{-z}\), used in boosting
 \newline
 (IV) Another Example : a mapping function \(\varphi : R^{3} \to R^{1000}\) , \(x \to [1,x_1,x_1^{2},x_1^{3},x_1 x_2,x_1 x_2^{2} .... ]\) (*) ,let d  = 3 , p =1000. If we exhaust all possibilities, then p = 1 + d + \(d^2\) + \(d^3\)  (**) 
 \newline
-Recall GD stepping : 
+Recall GD stepping  : 
 \[\theta := \theta + \alpha \sum_{i=1}^{n} (y^{(i)} - h_{\theta}(x^{(i)}))x^{(i)}\]
 \[\theta := \theta + \alpha \sum_{i=1}^{n} (y^{(i)} - \theta^Tx^{(i)})x^{(i)}\]
 Putting kernel mapping to the equation :
@@ -174,13 +174,39 @@ We pause here to evaluate the cost of computing each of update (Curse of Demensi
 Going back to BGD.
 \[\theta := \theta + \alpha \sum_{i=1}^{n} (y^{(i)} - \theta^T\phi(x^{(i)}))\phi(x^{(i)})\]
 , assuming 
-\(\theta = \sum_{i=1}^{n} \beta_i \phi(x^{(i)})\) at some point, with initialization \(\theta = 0 = \beta \)
+\(\theta = \sum_{i=1}^{n} \beta_i \phi(x^{(i)})\) (*) at some point, with initialization \(\theta = 0 = \beta \)
 \newline 
 It becomes 
 \[\theta := \sum_{i=1}^{n} \beta_i \phi(x^{(i)}) + \alpha \sum_{i=1}^{n} (y^{(i)} - \theta^T\phi(x^{(i)}))\phi(x^{(i)})\] 
 Rearranging : 
 \[\theta := \sum_{i=1}^{n} (\beta_i + \alpha  (y^{(i)} - \theta^T\phi(x^{(i)})))\phi(x^{(i)})\] 
-Therefore it is equivalent to updating \(\beta_i\) instead of \(\theta_i\) by 
+Therefore it is equivalent to updating \(\beta_i\) ( instead of \(\theta_i\) ) by 
 \[\beta_i := \beta_i + \alpha  (y^{(i)} - \theta^T\phi(x^{(i)}))\]
+by (*) above
 \[ \beta_i := \beta_i + \alpha \left( y^{(i)} - \sum_{j=1}^{n} \beta_j \phi(x^{(j)})^T \phi(x^{(i)}) \right)\]
+Computing of LHS is fast because : (1) we can pre-compute \( \phi(x^{(j)})^T \phi(x^{(i)})\) for all i,j, and (2) \( \phi(x^{(j)})^T \phi(x^{(i)})\) can be represented by \(<x^{(i)},x^{(j)}>\)  : 
+\newline
+\(\langle \phi(x), \phi(z) \rangle = 1 + \sum_{i=1}^{d} x_i z_i + \sum_{i,j \in \{1, \ldots, d\}} x_i x_j z_i z_j + \sum_{i,j,k \in \{1, \ldots, d\}} x_i x_j x_k z_i z_j z_k = 1 + \langle x, z \rangle + \langle x, z \rangle^2 + \langle x, z \rangle^3\) (**)
+\newline 
+\newline 
+Define K where K is n x n ( n is the number of training samples) matrix, with \(K(x, z) = \langle \phi(x), \phi(z) \rangle\) , where \(K_ij\) is \(\langle \phi(x^{(i)}), \phi(x^{(j)}) \rangle\)
+\newline\newline
+Therefore, the process is : (1) compute \(K_ij\) using (**) , \(\text{for all } i, j \in \{1, \ldots, n\}. \quad \text{Set } \beta := 0\) ,
+\newline
+ (2) Loop
+\[\forall i \in \{1, \ldots, n\}, \quad \beta_i := \beta_i + \alpha \left( y^{(i)} - \sum_{j=1}^{n} \beta_j K(x^{(i)}, x^{(j)}) \right)\] 
+in vectorized notation: 
+\[\beta := \beta + \alpha (\tilde{y} - K\beta)\]
+When doing inference : 
+\[\theta^T \phi(x) = \sum_{i=1}^{n} \beta_i \phi(x^{(i)})^T \phi(x) = \sum_{i=1}^{n} \beta_i K(x^{(i)}, x)\]
+In practice, computation using K O(d) instead of directly from \(\phi(x)\) is much faster. Further, We only need to know K but only know the existence of \(\phi(x)\) and no need to be able to write down. Consider the Kernel applied to bitmap : number of bits as d. (Great reduction!)
+\newline  
+Intuitively, K represents similarity matrix, i.e. K is small if \( \phi(x^{(j)})^T \phi(x^{(i)})\) is small
+\newline
+Example : Gaussian Kernel, it can support inifinitely dimensional space of mapping.
+\[K(x, z) = \exp\left(-\frac{||x - z||^2}{2\sigma^2}\right)\]
+\newline 
+Mercer Theorem : For K to be a valid Kernel , iff K is PSD.
+\newline 
+Application : To SVM, perceptron, linear regression, and other learning algorithm represented only in inner product \(\langle x,z\rangle\) , then Apply K(x,z)  
 \end{document}
