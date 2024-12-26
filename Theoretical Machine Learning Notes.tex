@@ -238,7 +238,29 @@ Example : Gaussian Kernel, it can support inifinitely dimensional space of mappi
 Mercer Theorem : For K to be a valid Kernel iff K is PSD.
 \newline 
 Application : To SVM, perceptron, linear regression, and other learning algorithms represented only in inner product \(\langle x,z\rangle\) , then Apply K(x,z)  
+\section{Generative vs Discriminative Learning Algorithm} 
 \section{Entropy} 
+Definition : 
+\[H(x) = -\sum_{i=1}^{n} p(x_i) \log_2 p(x_i)\] 
+where \(x_1, x_2...\) are all possible events of random variable(distribution) and   \(p(x_1), p(x_2)...\) are the probabilities of the respective events.
+\newline
+\newline
+Connection with uncertainty ( High Entropy , High Uncertainty ) :
+\newline
+\newline
+Entropy measure the uncertainity of a distribution. Consider a random variable distribution :  X=1 at 0.33 , X = 2 at 0.33, X=3 at 0.33, and another : X = 1  at 0.98 , X = 2 at 0.01, X =3 at 0.01, we say the former distribution has higher uncertainity ( more difficult to guess its value ). 
+\newline
+\newline
+Connection with amount of information in a *message* ( not distribution) :
+\newline
+\newline
+Average number of bits (yes/no answers) NEEDED TO PROVIDE to tell x in a message. Therefore High Entropy. Higher Uncertainty , Higher Amount of Information. 
+\newline
+\newline
+Connection with Decision Tree splitting : 
+\newline
+\newline
+Remember that DT is greedy algorithm : It is to find the split that have greatest reduction in uncertainty ( Information Gain ) of the distribution ( after splitting ). We have a certain distribution 
 \section{Decision Tree, with Random Forest, Boosting}
 \section{Boostrapping}
 \section{PCA, Principal Component Analysis}
