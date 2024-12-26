@@ -7,10 +7,39 @@
 Author : Anderson Chau
 \newline 
 \newline 
-Disclaimer : This notes is written only for my own memorization purpose after I have studied online lecture notes and blogs. 
+Disclaimer : This notes is written only for my memorization purpose after I have studied online lecture notes and blogs. 
 % ######################################################################
 % ######################################################################
 % ######################################################################
+\section{Confusion Matrix}
+Predict True, Actual True : True Positive (TP) \newline
+Predict True, Actual False : False Positive (FP) \newline
+Predict False, Actual False : False Negative (FN)\newline 
+Predict False, Actual True : True Negative (TN)\newline
+\newline
+\newline
+Accuracy = (TP+FN)/(TP+FP+FN+TN), performance of correct classification
+\newline
+\newline
+Precision = TP / (TP+FP)  ( correctly classified as positive / Everything classified as positive ), used when Cancer detection. (We don't want to initiate cancer treatment if the person is actually healthy).  
+\newline
+\newline
+Recall = TP / (TP + FN) ( correctly classified as positive / Actually positive ), FP is more expensive than TN . (e.g. Fraud detection).
+\newline
+\newline
+Note : Mathematically, Precision and Recall are inverse relationship, there is a trade off between recall and precision.
+\newline
+\newline
+F1 score = 2(P*R)/(P+R), a compromised metric
+ 
+\section{K-Nearest Neighbour}
+Description : Choose the *majority* class of nearest (e.g. Eclidean Distance ) K data an classify it. 
+\newline
+How to Choose K(hyper-paramaeter) : General rule of thumb : sqrt(number of data)/2 or by searching and comparing different k's for highest prediction accuracy.
+\newline 
+Normalization of data in preprocessing is a must
+
+
 \section{K-Means Clustering}
 Simple Description : Identify clusters by finding the centroid of data points
 \newline
@@ -199,14 +228,33 @@ in vectorized notation:
 \[\beta := \beta + \alpha (\tilde{y} - K\beta)\]
 When doing inference : 
 \[\theta^T \phi(x) = \sum_{i=1}^{n} \beta_i \phi(x^{(i)})^T \phi(x) = \sum_{i=1}^{n} \beta_i K(x^{(i)}, x)\]
-In practice, computation using K O(d) instead of directly from \(\phi(x)\) is much faster. Further, We only need to know K but only know the existence of \(\phi(x)\) and no need to be able to write down. Consider the Kernel applied to bitmap : number of bits as d. (Great reduction!)
+In practice, we do computation using K ( at O(d) cost ) instead of directly from \(\phi(x)\) is much faster. Further, We only need to know K but "just only need to know" the existence of \(\phi(x)\). There is no need to be able to write down \(\phi(x)\). Consider the Kernel applied to bitmap : number of bits as d. (Great reduction!)
 \newline  
 Intuitively, K represents similarity matrix, i.e. K is small if \( \phi(x^{(j)})^T \phi(x^{(i)})\) is small
 \newline
 Example : Gaussian Kernel, it can support inifinitely dimensional space of mapping.
 \[K(x, z) = \exp\left(-\frac{||x - z||^2}{2\sigma^2}\right)\]
 \newline 
-Mercer Theorem : For K to be a valid Kernel , iff K is PSD.
+Mercer Theorem : For K to be a valid Kernel iff K is PSD.
 \newline 
-Application : To SVM, perceptron, linear regression, and other learning algorithm represented only in inner product \(\langle x,z\rangle\) , then Apply K(x,z)  
+Application : To SVM, perceptron, linear regression, and other learning algorithms represented only in inner product \(\langle x,z\rangle\) , then Apply K(x,z)  
+\section{Entropy} 
+\section{Decision Tree, with Random Forest, Boosting}
+\section{Boostrapping}
+\section{PCA, Principal Component Analysis}
+\section{SVD, Singular Value Decomposition}
+\section{SVM, Support Vector Machine}
+\section{Backpropagation}
+\section{EM Algorithm}
+\section{Generative Learning Algorithm}
+\section{Reinforcement learning}
+\section{MAP (Maximum a Posterior) vs MLE (Maximum Likelihood Estimation)} 
+\section{IDP, Indepent Component Analysis}
+\section{Bias Variance Analysis} 
+\section{Hidden Markov Model}
+\section{Apriori}
+\section{Recommender System}
+\section{Anomaly Detection} 
+\section{Perceptron}
+
 \end{document}
