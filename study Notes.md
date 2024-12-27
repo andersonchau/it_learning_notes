@@ -95,7 +95,8 @@
 - SSL Termination (SSLCertificateFile/SSLCertificateKeyFile/SSLCertificateChainFile)
 - Manage Header/Cookie ( CORS , Add security header ) 
 - Adding hooks to impelement extra Feature ( LUA + QueueIT ) 
-- High performance configuration (Worker thread count)
+- High performance configuration (Worker thread count , mpm)
+- Foward Proxy 
 
 ### IT-Product : JBoss 
 - Servlet Container ( for Servlet , Angular/React packaged to WAR, Spring Application ) 
