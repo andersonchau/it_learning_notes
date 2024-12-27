@@ -87,7 +87,7 @@
 - Static content hosting (HTML/CSS/JS) 
 - DMZ Face
 - URL Rewriting , ( can also based on logics ) {RewriteEngine - RewriteRule} 
-- Implement IP Address Ratemeter  
+- Implement IP Address Ratemeter  (ModSecurity) 
 - Monitor HTTP Traffic 
 - As Load Balancer 
 - Host/Port based Routing to workers ( VirutalHosts)
@@ -95,7 +95,18 @@
 - SSL Termination (SSLCertificateFile/SSLCertificateKeyFile/SSLCertificateChainFile)
 - Manage Header/Cookie ( CORS , Add security header ) 
 - Adding hooks to impelement extra Feature ( LUA + QueueIT ) 
-- High performance configuration 
+- High performance configuration (Worker thread count)
+
+### IT-Product : JBoss 
+- Servlet Container ( for Servlet , Angular/React packaged to WAR, Spring Application ) 
+- JBoss EAP ( Commercial Version Supported by Redhat ) 
+- Wildfly (prev. JBoss AS) -- community version of JBoss
+- JNDI connection to DB with connection pool 
+- SSL Handling 
+- Log management
+- Undertow HTTP Handler ( work like Tomcat) 
+- Extra Enterprise Level Services ( e.g. ActiveMQ,Mail, Caching )  
+- HA Mode vs Standalone mode 
 
 ### IT-Product : Queue-IT 
 - Waiting room feature, controlling the ther number of user to enter the protected site per minute (Speed) 
@@ -103,12 +114,12 @@
 - Implementation I (Frontend) : Insert QIT JS in frontpage, ask client to goto QIT-waiting room to wait. => Insecure, User can bypass the checking 
 - Implementation II (Backend) : Insert a Interceptor Logic to Public Facing Server. (1) check cookie for QIT token (2) return 302 to Queue Server (3) After waiting -> QIT Server return QIT Token -> 302 back to site  (4) Client present QIT token and enter site. 
 - Queue Outflow (per minutes) : Number user to be allowed to ENTER site. Estimation based on : load test result , bandwidth, How long a typical user stay in the site. 
+- Can request Load test timeslot from QIT, to avoid trigger security measure. 
 
 ### IT-Product : WAF F5 
-- Feature : Traffic Learning , block suspicious requests and attacks 
+- Feature : Security Policy, Traffic Learning , block suspicious requests and attacks 
+- Bot Defense ( With URL whitelist)
 - IP Whitelisting / blacklisting 
 - Traffic Monitoring 
-- HealthCheck to downstream nodes
-
-
-
+- As load balancer, with HealthCheck to downstream nodes
+- SSL Termination
