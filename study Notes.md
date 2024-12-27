@@ -83,6 +83,20 @@
 - e.g. Phishing Email : https://abc.com/xxx?<Malicious_JS_SCRIPTS> 
 - e.g. Save Malicious JS script to server and load the JS to victims PC.( Prevention method : to escape special characters to prevent HTML injection)
 
+### IT-Product : Apache HTTPD
+- Static content hosting (HTML/CSS/JS) 
+- DMZ Face
+- URL Rewriting , ( can also based on logics ) {RewriteEngine - RewriteRule} 
+- Implement IP Address Ratemeter  
+- Monitor HTTP Traffic 
+- As Load Balancer 
+- Host/Port based Routing to workers ( VirutalHosts)
+- Path based Routing to workers , route request to App Server workers/VMs ( ProxyPass/ProxyPassReverse)
+- SSL Termination (SSLCertificateFile/SSLCertificateKeyFile/SSLCertificateChainFile)
+- Manage Header/Cookie ( CORS , Add security header ) 
+- Adding hooks to impelement extra Feature ( LUA + QueueIT ) 
+- High performance configuration 
+
 ### IT-Product : Queue-IT 
 - Waiting room feature, controlling the ther number of user to enter the protected site per minute (Speed) 
 - QUEUE vs Waiting Room Concept : Can have multiple waiting room (e.g. UAT/DEV/PROD ), but share the same QUEUE. Waiting room as logical queue partition. 
@@ -95,5 +109,6 @@
 - IP Whitelisting / blacklisting 
 - Traffic Monitoring 
 - HealthCheck to downstream nodes
+
 
 
