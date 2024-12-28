@@ -7,7 +7,7 @@
 Author : Anderson Chau
 \newline 
 \newline 
-Disclaimer : This notes is written only for my memorization purpose after I have studied online lecture notes and blogs. 
+Disclaimer : The notes are written only for my memorization purpose after I have studied online lecture notes and blogs. 
 % ######################################################################
 % ######################################################################
 % ######################################################################
@@ -21,19 +21,19 @@ Predict False, Actual True : True Negative (TN)\newline
 Accuracy = (TP+FN)/(TP+FP+FN+TN), performance of correct classification
 \newline
 \newline
-Precision = TP / (TP+FP)  ( correctly classified as positive / Everything classified as positive ), used when Cancer detection. (We don't want to initiate cancer treatment if the person is actually healthy).  
+Precision = TP / (TP+FP)  ( correctly classified as positive / Everything classified as positive ), example usage : Cancer detection. (We don't want to initiate cancer treatment if the person is actually healthy).  
 \newline
 \newline
 Recall = TP / (TP + FN) ( correctly classified as positive / Actually positive ), FP is more expensive than TN . (e.g. Fraud detection).
 \newline
 \newline
-Note : Mathematically, Precision and Recall are inverse relationship, there is a trade off between recall and precision.
+Note : Mathematically, Precision and Recall are inverse relationship, there is a tradeoff between recall and precision.
 \newline
 \newline
 F1 score = 2(P*R)/(P+R), a compromised metric
  
 \section{K-Nearest Neighbour}
-Description : Choose the *majority* class of nearest (e.g. Eclidean Distance ) K data an classify it. 
+Description : Choose the *majority* class of nearest (e.g. Eclidean Distance ) K data points and classify it.  
 \newline
 How to Choose K(hyper-paramaeter) : General rule of thumb : sqrt(number of data)/2 or by searching and comparing different k's for highest prediction accuracy.
 \newline 
@@ -261,11 +261,68 @@ Connection with Decision Tree splitting :
 \newline
 \newline
 Remember that DT is greedy algorithm : It is to find the split that have greatest reduction in uncertainty ( Information Gain ) of the distribution ( after splitting ). We have a certain distribution 
+\section{SVM, Support Vector Machine}
+Assumptions for illustration : data in binary classes only, linearly separable (if not, then apply Kernel )
+\newline
+Main Idea in Training : We construct a separating hyperplane, the plane has largest distance to all data point. 
+\newline 
+How ? 
+\newline
+Let \(y \in \{-1, 1\}\) 
+\newline
+Define classifier \(h_{w,b}(x) = g(w^T x +b)\), where \(w^T x +b\) is the formula of hyperplane, w is the normal vector to hyperplane.
+\newline 
+where g : \(g(z) = 1 \text{ if } z \ge 0 ,  g(z) = -1 \text{ if } z < 0\)
+\newline 
+where w = \([\theta_1...\theta_n]^T\)
+\newline 
+Define functional margin (FM): \(\hat{\gamma}^{(i)} = y^{(i)} (w^T x + b)\) .
+\newline 
+If FM is positive, it classify correctly. Negative, classify incorrectly. 
+\newline
+If the magnitude is large , classifier is confident. 
+\newline
+Define Geometric Margin (GM), \(\gamma_i = \frac{\hat{\gamma^i}}{\|w\|}\)
+\newline
+Further define smallest distance from hyperplane to data points : \(\gamma = \min_{i=1, \ldots, m} \gamma^{(i)}\)
+\newline 
+Thus, our training objective is to maximize this smallest distance.
+\[
+\max_{\gamma, \mathbf{w}, b}  \quad \gamma \\
+\]
+\[
+\text{s.t.}  \quad y^{(i)} (\mathbf{w}^T \mathbf{x}^{(i)} + b) \geq \gamma, \quad i = 1, \ldots, m \\
+\]
+\[
+ \quad \|\mathbf{w}\| = 1
+\]
+The last condition ensure FM =\(>\)GM 
+\newline
+Why use GM instead of FM in training ? We can always scale w and b to achieve greater magnitude in FM, therefore FM is meaningless for training. 
+\newline 
+Rearranging :
+\newline
+\[
+\max_{\gamma, \mathbf{w}, b}  \quad \hat{\gamma} / \quad \|\mathbf{w}\|
+\]
+\[
+\text{s.t.}  \quad y^{(i)} (\mathbf{w}^T \mathbf{x}^{(i)} + b) \geq \hat{\gamma}, \quad i = 1, \ldots, m \
+\]
+In order to make it a convex optimization problem ( another subject to study ! F! )\newline
+(1) we restrict the value of \(\hat{\gamma} = 1\) , by scaling w and b (can do single w/b for all \(\hat{\gamma} \) ?)  \newline
+(2) and rewriting \(\frac{\hat{\gamma}}{\|\mathbf{w}\|} = \frac{1}{\|\mathbf{w}\|}\),
+we  get w in from nominator to denominator
+\[
+\min_{\gamma, \mathbf{w}, b}  \quad \frac{1}{2} \|\mathbf{w}\|^2 \\
+\]
+\[
+\text{s.t.} \quad y^{(i)} (\mathbf{w}^T \mathbf{x}^{(i)} + b) \geq 1, \quad i = 1, \ldots, m
+\]
+Apply cvx opt. library to solve the above problem 
+\section{Boostrapping} 
 \section{Decision Tree, with Random Forest, Boosting}
-\section{Boostrapping}
 \section{PCA, Principal Component Analysis}
 \section{SVD, Singular Value Decomposition}
-\section{SVM, Support Vector Machine}
 \section{Backpropagation}
 \section{EM Algorithm}
 \section{Generative Learning Algorithm}
