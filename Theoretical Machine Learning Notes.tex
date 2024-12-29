@@ -7,7 +7,8 @@
 Author : Anderson Chau
 \newline 
 \newline 
-Disclaimer : The notes are written only for my memorization purpose after I self-studied online lecture notes (mainly Stanford CS109, CS229, CS168, CS231n, Cornell CS4780, Andrew Ng's (I am his fan) Coursera courses ) and other online resources ( Stack Exchange, TowardDataScience ).
+Disclaimer : The notes are written only for my understanding and memorization purpose after I have self-studied those online lecture notes (mainly Stanford CS109, CS229, CS168, CS231n, Cornell CS4780, Andrew Ng's (I am his fan) Coursera courses ) and other online resources ( Stack Exchange, TowardDataScience ).
+
 % ######################################################################
 % ######################################################################
 % ######################################################################
@@ -252,7 +253,7 @@ Application : To SVM, perceptron, linear regression, and other learning algorith
  
 \section{Generative vs Discriminative Learning Algorithm for classification, discussion} 
 D : Learn the curve that separates the classes, e.g. Logistic Regression, SVM , ANN, CNN \newline
-G : Learn the model itself and just class of data. e.g. Naive Bayes, Gradient Discriminant Analysis, GAN\newline
+G : Learn (all the parameters of ) the model itself and just class of data. e.g. Naive Bayes, Gradient Discriminant Analysis, GAN\newline
 An Analogy of G : Learn both English and French , and guess whether the word Bonjour is French or English. \newline
 Another Example of G (*): \newline
 Let's say a model is trained with 1000 pictures :\newline 
@@ -263,11 +264,50 @@ Let's say a model is trained with 1000 pictures :\newline
 Assume we have a photo with a glasses. To classify a dog or human in the picture for a generative model : Since P ( H \& G ) = 0.26 \(>\) P(D \& G ) = 0.001, the model infer that it is a human.\newline
 let x be feature, y be class\newline
 Put it in another way, in D  (e.g. (multi-class) logistic regression) , we learn h which is p(y\(|\)x) and infer the class with largest p(y\(|\)x). i.e. we are finding \(argmax_{y} p(y|x)\)\newline
-In D, let y be the class (Dog=1 vs Human=0) , x be feature( with glasses ) , we learn p(x\(|\)y=1) ( case (i)/(ii) )  and p(x\(|\)y=0) ( case (iii)/(iv) )\newline 
-Mathematically, D and G's relationship :  \(argmax_{y} p(y|x) = argmax_{y} \frac{p(x|y)p(y)}{p(x)} = argmax_{y} p(x|y)p(y) = argmax_{y} p(x \& y) \)\newline
+In G, we are learning p(x\(|\)y) (by learning all p(x) for each possible classes of y  ) and p(y) (pdf of all classes of y ). Let y be the class (Dog=1 vs Human=0) , x be feature( with glasses ) , we learn p(x\(|\)y=1) ( case (i)/(ii) )  and p(x\(|\)y=0) ( case (iii)/(iv) )\newline 
+Mathematically, D and G's relationship :  \(argmax_{y} p(y|x) [D] = argmax_{y} \frac{p(x|y)p(y)}{p(x)} = argmax_{y} p(x|y)p(y) [G] = argmax_{y} p(x \& y) \)\newline
 (bayes rule, x is independent variable, bayes rule again, also see (*) )\newline
+\section{Naive Bayes Classifier}
+An example of Generative Learning algorithm Example usage , spam mail detection\newline
+Let \(x_i\)'s be the all words in dictionary. y = 1 for spam mail, y = 0 for non-spam mail. \newline
+In training, we want to learn the parmaters : \(\phi_y\) ( p of spam mail) , \(\phi_{j(y=1)}\) ( p of \(j^{th}\) word appearing in spam mail), and \(\phi_{j(y=0)}\) \newline
+We have the following joint likelihood function 
+\[L(\phi_y, \phi_{j(y=0)}, \phi_{j(y=1)}) = \prod_{i=1}^{n} p(x^{(i)} , y^{(i)})\]
+\[
+\phi_{j(y=1)} = \sum^{n}_{i=1} 1\{x_j^{(i)} = 1 \wedge y{(i)} = 1 \}
+\]
+\[
+\phi_{j(y=0)} = \sum^{n}_{i=1} 1\{x_j^{(i)} = 1 \wedge y{(i)} = 0 \}
+\]
+\[
+\phi_y = \sum^{n}_{i=1} 1\{ y{(i)} = 1 \}
+\]
+Above is just simple counting\newline\newline
+For Inference, how ?\newline
+A (non-)spam email having x's words has the probability :
+\[
+	p(x's|y) = p(x_1....x_{5000} |  y) = p(x_1|  y)p(x_2|y,x_1)p(x_3|y,x_2,x_1)....p(x_{5000}|y,x_2,x_1,....,x_{4999})
+\]
+\[
+= p(x_1|  y)p(x_2|y)p(x_3|y)....p(x_{5000}|y) = \prod_{i=1}^{n} p(x_i \mid y_i)
+\]
+First by bayes rule(can be proved by induction), then by naives bayes assumption. e.g. \(p(x_{2087}|y) = p(x_(2087) | y,x_{39831})\) 
 
+Finally compare \(p(y=1|x's)\) and \(p(y=0|x's)\) to determine whether it is a spam mail or not: \newline
+By bayes rule, 
+\[
+	p(y = 1 | x's) = p(x's|y =1)p(y =1) /p(x's)  
+\]
+\[
+= \frac{\prod_{j=1}^{d} p(x_j \mid y=1) p(y=1)}{\prod_{j=1}^{d} p(x_j \mid y=1) p(y=1) + \prod_{j=1}^{d} p(x_j \mid y=0) p(y=0)}
+\]
+\[
+= \frac{\prod_{j=1}^{d} \phi_{j(y=1)} \phi_y}{\prod_{j=1}^{d} \phi_{j(y=1)} \phi_y + \prod_{j=1}^{d} \phi_{j(y=0)} (1-\phi_y)}
+\]
 
+TODO : Laplace Smoothing
+\section{Bernoulli event model} 
+\section{Gradient Discriminant Analysis} 
 \section{Entropy} 
 Definition : 
 \[H(x) = -\sum_{i=1}^{n} p(x_i) \log_2 p(x_i)\] 
@@ -349,12 +389,13 @@ we  get w in from nominator to denominator
 \]
 Apply cvx opt. library to solve the above problem 
 \section{Boostrapping} 
-\section{Decision Tree, with Random Forest, Boosting}
+\section{Decision Tree}
+\section{Random Forest}
+\section{Boosting}
 \section{PCA, Principal Component Analysis}
 \section{SVD, Singular Value Decomposition}
 \section{Backpropagation}
 \section{EM Algorithm}
-\section{Generative Learning Algorithm}
 \section{Reinforcement learning}
 \section{MAP (Maximum a Posterior) vs MLE (Maximum Likelihood Estimation)} 
 \section{IDP, Indepent Component Analysis}
@@ -364,5 +405,8 @@ Apply cvx opt. library to solve the above problem
 \section{Recommender System}
 \section{Anomaly Detection} 
 \section{Perceptron}
+\section{KL Divergence}
+\section{Cross Entropy}
+\section{Cross Validation}
 
 \end{document}
