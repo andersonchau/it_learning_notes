@@ -261,7 +261,7 @@ Let's say a model is trained with 1000 pictures :\newline
 (ii) Dog with glasses : 239 \newline
 (iii) Human without glasses : 500 \newline
 (iv) Human with glasses : 260 \newline
-Assume we have a photo with a glasses. To classify a dog or human in the picture for a generative model : Since P ( H \& G ) = 0.26 \(>\) P(D \& G ) = 0.001, the model infer that it is a human.\newline
+Assume we have a photo with a glasses. To classify a dog or human in the picture for a generative model : Since P ( H \& G ) / P (G)= 260/261 \(>\) P(D \& G ) / P(G)= 1/261, the model infer that it is a human.\newline
 let x be feature, y be class\newline
 Put it in another way, in D  (e.g. (multi-class) logistic regression) , we learn h which is p(y\(|\)x) and infer the class with largest p(y\(|\)x). i.e. we are finding \(argmax_{y} p(y|x)\)\newline
 In G, we are learning p(x\(|\)y) (by learning all p(x) for each possible classes of y  ) and p(y) (pdf of all classes of y ). Let y be the class (Dog=1 vs Human=0) , x be feature( with glasses ) , we learn p(x\(|\)y=1) ( case (i)/(ii) )  and p(x\(|\)y=0) ( case (iii)/(iv) )\newline 
@@ -304,8 +304,16 @@ By bayes rule,
 \[
 = \frac{\prod_{j=1}^{d} \phi_{j(y=1)} \phi_y}{\prod_{j=1}^{d} \phi_{j(y=1)} \phi_y + \prod_{j=1}^{d} \phi_{j(y=0)} (1-\phi_y)}
 \]
-
-TODO : Laplace Smoothing
+Practically : (1) Remove common words in preprocessing. e.g. the , of (stop words) (2) Instead of labeling all words in dictionary, we build only from trained data. \newline\newline
+\textbf{Laplace Smoothing} -- Handling unseen word\newline 
+Problem :  both classes give zero in p(x|y) \newline
+To solve :  Treat that new word to have appaeared in all classes once, good thing is that it won't change the relative p :\newline
+\[
+P(j \mid y=1) = \frac{1 + \sum_{i=1}^{n} 1\{x_j^{(i)}  = 1 \wedge y^{(i)} = 1\} }{2 + \sum_{i=1}^{n} 1\{ y^{(i)} = 1\} }
+\]
+\[
+P(j \mid y=0) = \frac{1 + \sum_{i=1}^{n} 1\{x_j^{(i)}  = 1 \wedge y^{(i)} = 0\} }{2 + \sum_{i=1}^{n} 1\{ y^{(i)} = 0\} }
+\]
 \section{Bernoulli event model} 
 \section{Gradient Discriminant Analysis} 
 \section{Entropy} 
