@@ -406,6 +406,83 @@ Aim to reduce variance \newline
 Ramdom Forest : Bagging + randomly remove features in build indivudal trees \newline
 
 \section{Boosting}
+
+Main Idea : Boosting transform weak learner to strong classifier, by increasing the weight of wrongly classified samples to force the classifier to do well on those samples. 
+
+
+
+Let \(\phi_{\tau} (x^{(i)} \) be a  weak learner (e.g. Decision Stump).
+\[
+h_\theta(x) = \text{sign} \left( \sum_{j=1}^n \theta_j \phi_j(x) \right)
+\] 
+is the hypothesis of boosting.\newline
+Loss function (also check the general loss function discussion above) : \newline
+\[
+J(\theta) = \frac{1}{m} \sum_{i=1}^{m} \exp(-y^{(i)} \theta^T \phi(x^{(i)}))
+\]
+By Coordinate descent (choose a coordinate in \(\theta\)  and compute  
+\[
+\theta_j = \arg \min_{\theta_j} J(\theta)
+\]
+
+
+Specifically, the boosting algorithm performs coordinate descent on the exponential loss for classification problems. The objective:
+
+Coordinate descent algorithm: \newline
+1. Choose a coordinate \( j \in \{1, \ldots, N\} \)
+2. Update \( \theta_j \): \( \theta_j = \arg \min_{\theta_j} J(\theta) \)
+   Leave \( \theta_k \) unchanged for all \( k \neq j \)
+   Iterate until convergence
+
+Derivation of the coordinate update for coordinate \( j \):
+
+$$J(\theta) = \frac{1}{m} \sum_{i=1}^{m} \exp(-y^{(i)} \theta^T \phi(x^{(i)}))$$
+
+The objective function:
+
+$$J(\theta) = \frac{1}{m} \sum_{i=1}^{m} \exp \left( -y^{(i)} \sum_{j=1}^{N} \theta_j \phi_j(x^{(i)}) \right)$$
+
+Property of exp:
+
+$$J(\theta) = \frac{1}{m} \sum_{i=1}^{m} w_i \exp \left( -y^{(i)} \theta_j \phi_j(x^{(i)}) \right)$$
+
+Define \( w_i = \exp \left( -y^{(i)} \sum_{k \neq j} \theta_k \phi_k(x^{(i)}) \right) \)
+
+To optimize coordinate \( \theta_j \):
+
+$$\theta_j = \arg \min_{\theta_j} \sum_{i=1}^{m} w_i \exp \left( -y^{(i)} \theta_j \phi_j(x^{(i)}) \right)$$
+
+Define the weights:
+
+$$w_i = \exp \left( -y^{(i)} \sum_{k \neq j} \theta_k \phi_k(x^{(i)}) \right)$$
+
+Optimizing coordinate \( \theta_j \) corresponds to minimizing:
+
+$$\sum_{i=1}^{m} w_i \exp \left( -y^{(i)} \theta_j \phi_j(x^{(i)}) \right)$$
+
+Define:
+
+$$w_i^+ := \sum_{i: y^{(i)} \phi_j(x^{(i)}) = 1} w_i$$
+$$w_i^- := \sum_{i: y^{(i)} \phi_j(x^{(i)}) = -1} w_i$$
+**************************\newline
+Following is the whole algorithm  : \newline
+**************************\newline
+For each iteration \( t = 1, 2, \ldots \): \newline
+
+(i) Define weights \[ w^{(i)} = \exp \left( -y^{(i)} \sum_{\tau=1}^{t-1} \theta_{\tau} \phi_{\tau} (x^{(i)}) \right) \] 
+and distribution, which is the weight (which is uniform initially) attached to each sample, we are tuning this : 
+
+\[ p^{(i)} = \frac{w^{(i)}}{\sum_{j=1}^{m} w^{(j)}} \]  
+
+(ii) Construct a weak hypothesis \( \phi_t : R^n \rightarrow \{-1,1\} \) from the distribution 
+\[ p = \left( p^{(1)}, \ldots, p^{(m)} \right) \] 
+on the training set. \newline
+
+(iii) Compute \[ W^+_t = \sum_{i : y^{(i)} \phi_t (x^{(i)}) = 1} w^{(i)} \] 
+and 
+\[ W^-_t = \sum_{i : y^{(i)} \phi_t (x^{(i)}) = -1} w^{(i)} \] and set \[ \theta_t = \frac{1}{2} \log \frac{W^+_t}{W^-_t} . \] 
+\section{Proof of Boosting convergence and Discussion of weak learners}
+Omitted
 \section{PCA, Principal Component Analysis}
 \section{SVD, Singular Value Decomposition}
 \section{Backpropagation}
