@@ -396,9 +396,15 @@ we  get w in from nominator to denominator
 \text{s.t.} \quad y^{(i)} (\mathbf{w}^T \mathbf{x}^{(i)} + b) \geq 1, \quad i = 1, \ldots, m
 \]
 Apply cvx opt. library to solve the above problem 
-\section{Boostrapping} 
-\section{Decision Tree}
-\section{Random Forest}
+
+\section{Bagging and Random Forest}
+Review of Decision Tree : Greedy algorithm , Split on latest Information gain, Entropy/Gini Coefficient \newline
+Bagging =  Bootstrapping + Aggregration \newline
+Boostrapping = Resample with replacement, to generate different sample set of "same population"  \newline
+Aggregration = perform averaging / voting with different Trees from different boostraping samples \newline
+Aim to reduce variance \newline
+Ramdom Forest : Bagging + randomly remove features in build indivudal trees \newline
+
 \section{Boosting}
 \section{PCA, Principal Component Analysis}
 \section{SVD, Singular Value Decomposition}
