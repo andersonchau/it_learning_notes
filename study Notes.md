@@ -33,7 +33,7 @@
 <ol>
   <li>Setup Phase</li>
   <ul>
-	<li>Obtain Client ID, Scope, Client Secret from Authentication providers ( e.g. GOOGLE)</li>
+	<li>Obtain Client ID, Scope, Client Secret from Authentication providers ( e.g. GOOGLE, Keycloak)</li>
   </ul>
   <li>SSO Login Flow</li>
   <ol>
@@ -48,7 +48,7 @@
 </ol>
 
 ### Remote SSH's(SCP) PK Authentication (Useful for CI/CD) 
-1. Trust Remote Servers by putting remote server's fingerprint (short version of public key)to my known_hosts files: *ssh-keyscan -H <remote_server_IP> >> ~/.ssh/known_hosts* ( Purpose : build the trust to remove host here, analogous to inserting SSL cert to truststore) 
+1. Trust Remote Servers by putting remote server's fingerprint (short version of public key)to my known_hosts files: *ssh-keyscan -H <remote_server_IP> >> ~/.ssh/known_hosts* ( Purpose : build the trust to remote host here, analogous to inserting SSL cert to truststore) 
 2. Create Pri-Pub Key pairs (Cmd : *ssh-keygen -t rsa* (generated 2 files: ~/.ssh/id_rsa (private key) and ~/.ssh/id_rsa.pub (public key), then enter passphrase to encrypt the Private Key ) 
 3. Copy Public Key to remote server's authorized_keys files (scp ~/.ssh/id_rsa.pub username@hostName , then cat ~/id_rsa.pub >> ~/.ssh/authorized_keys ) ( Purpose : Let remote server to trust me )
 4. cat public_key_file >> ~/.ssh/authorized_keys 
@@ -77,7 +77,7 @@
 ### CSRF ( Cross Site Request Forgery )
 - Prevention - CSRF Token : A one-time token sent from server to frontend page (probably containing a FORM ), the form POST back CSRF token
 - To prevent cross-site access by matching server assigned token 
-- e.g. In Spring Security , it can insert hidden field in <input type="hidden" name="_csrf" value="4bfd1575-3ad1-4d21-96c7-4ef2d9f86721"/> 
+- e.g. In Spring Security , it can insert hidden field in input tag <input type="hidden" name="_csrf" value="4bfd1575-3ad1-4d21-96c7-4ef2d9f86721"/> 
 
 ### XSS Attack by Example : 
 - Inject JS to victims browsers and execute , to steal victims' data 
