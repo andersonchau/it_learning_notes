@@ -1,6 +1,6 @@
-# IT Learning Notes
+# IT/Software Engineering/Programming/Web Development notes
 
-# Web Development and Others
+## Web Development and Others
 
 ### Redirect (HTTP 302) 
 - Backend tell frontend to go to another URL by http 302
@@ -10,6 +10,7 @@
 	RewriteRule ^match\.html$ rewrite.html [NC,L] 
 ```
 - Used in OAuth2, redirecting back to original page in Application 
+- Used in HTTP to HTTPS redirection
 
 ### URL Rewriting 
 - Purely done in backend , not noticeable by client
@@ -54,7 +55,7 @@
 5. Then you can access remote server using scp or ssh to run commmand.
 
 ### CAP Theorem 
-- C : Consistency, A : Availability , P : Partition Tolerence, CA(dont pratically exist)/AP/CP can exists but not CAP
+- C : Consistency, A : Availability , P : Partition Tolerence, CA(dont practically exist)/AP/CP can exists but not CAP
 - P is a condition, A/P is Goal=> Choose Either AP or CP 
 - "In a distributed data store, at the time of network partition you have to chose either Consistency or Availability and cannot get both"
 - C : Data Consistency for all nodes (all nodes store the recent write)
@@ -82,6 +83,18 @@
 - Inject JS to victims browsers and execute , to steal victims' data 
 - e.g. Phishing Email : https://abc.com/xxx?<Malicious_JS_SCRIPTS> 
 - e.g. Save Malicious JS script to server and load the JS to victims PC.( Prevention method : to escape special characters to prevent HTML injection)
+
+### Simple Enrcryption for Programmers 
+
+- SHA256 Hash : for password hashing before saving to DB.  
+- MD5 Hash : for checking File Integrity 
+- Encryption as Rest : Achieved by Software library , Hardware Drivers.
+- Symmetric Secret Key Application Data encryption - AES256, Provided by Spring Crypto library, Apache Common ( Sometimes embedded with Timestamp ) 
+
+### Microservices 
+
+
+## IT-Products
 
 ### IT-Product : Apache HTTPD
 - Static content hosting (HTML/CSS/JS) 
@@ -124,3 +137,58 @@
 - Traffic Monitoring 
 - As load balancer, with HealthCheck to downstream nodes
 - SSL Termination
+
+
+## Software Engineering
+
+### SDLC (Software Development Life Cycle)
+ 
+- Waterfall Model: Requirements,Req. Analysis,Design,Implementation,Testing,Deployment,Maintenance
+- Iterative Waterfall Model e.g. R->RA->D->I->T->D->I->T->D->I->T. .. Code, get feedback, Code.
+- Iterative : Better adapting to change in Req./Technology, higher cost.
+- Agile : ????
+
+
+### Specification Documents
+ 
+1. Requirement Spec  
+- What the application should do ?
+- Read by Manager, Client, Users
+- In business sense, what the system do to achieve business goal. What are those business rules from users's perspective ?
+
+2. Functional Spec (Sometimes called System Spec.)
+- How the application function ? 
+- Read by Tester, Maintainer, System Analyst.
+
+3. Program Spec 
+- How to Implement ?
+- Pesudo Code. 
+- Ready by Programmer
+
+4. Thoughts : 
+- RS and FS should be describing the same thing. Just that FS is more system component/flow oriented while RS is more business oriented. 
+
+
+### Commonly used design diagrams  
+- UML Use Case Digram 
+- UML Class Diagram 
+- UML Sequence Diagram 
+- Flow chart ( not UML ), UML Activity is complex verion of Flow chart 
+
+### Class diagram -- Relationship 
+- Dependency   ---------> (Too vague , not commonly used ).
+- Association  _________ , Example Teacher teaches students,   
+- Aggregration ________<> , describe "HAS A" relationship   e.g. Car <>________ Passenger
+- Composition  ________<B> , describe "OWN A" relationship, e.g. Dog <B>______ Tail    
+- Inheritence _________|> , describe "IS A" relationship , e.g. Bank Account <|_______ Saving Account 
+- Realization ---------|S>  
+
+- Aggregation vs Composition : Compo -- parts cannot exist alone, the main controls the lifetime(existence) of the part.While not so for Agg. 
+- Aggregation vs Association : You can say Teacher "HAS A" Student. Just that association does not make clear. Aggregation is special case of Association.
+- All relations bolt down to "What you think about the system" 
+
+### Testing 
+- Integration Test 
+- Unit Test 
+- Regression Test 
+- Black Box Test vs Transparent Test 

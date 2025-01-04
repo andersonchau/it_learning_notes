@@ -407,7 +407,7 @@ Ramdom Forest : Bagging + randomly remove features in build indivudal trees \new
 
 \section{Boosting}
 
-Main Idea : Boosting transform weak learner to strong classifier, by increasing the weight of wrongly classified samples to force the classifier to do well on those samples. 
+Main Idea : Boosting transform weak learner to strong classifier, by increasing the weight of wrongly classified samples to force the classifier to do well on those samples.  It is kind of ensembling ( by attaching different weights to different classifiers ). 
 
 
 
@@ -481,8 +481,9 @@ on the training set. \newline
 (iii) Compute \[ W^+_t = \sum_{i : y^{(i)} \phi_t (x^{(i)}) = 1} w^{(i)} \] 
 and 
 \[ W^-_t = \sum_{i : y^{(i)} \phi_t (x^{(i)}) = -1} w^{(i)} \] and set \[ \theta_t = \frac{1}{2} \log \frac{W^+_t}{W^-_t} . \] 
-\section{Proof of Boosting convergence and Discussion of weak learners}
-Omitted
+Proof of Boosting convergence and Discussion of weak learners : Omitted
+\section{Bias Variance Analysis} 
+
 \section{PCA, Principal Component Analysis}
 \section{SVD, Singular Value Decomposition}
 \section{Backpropagation}
@@ -490,7 +491,7 @@ Omitted
 \section{Reinforcement learning}
 \section{MAP (Maximum a Posterior) vs MLE (Maximum Likelihood Estimation)} 
 \section{IDP, Indepent Component Analysis}
-\section{Bias Variance Analysis} 
+
 \section{Hidden Markov Model}
 \section{Apriori}
 \section{Recommender System}
