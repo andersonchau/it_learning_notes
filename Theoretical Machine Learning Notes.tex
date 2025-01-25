@@ -42,7 +42,7 @@ Note : Mathematically, Precision and Recall are in inverse relationship, there i
 \newline
 F1 score = 2(P*R)/(P+R), a compromised metric
 
-
+\section{KL Divergence}
 \section{K-Nearest Neighbour}
 Description : Choose the *majority* class of nearest (e.g. Eclidean Distance ) K data points and classify it.  
 \newline
@@ -118,6 +118,7 @@ Again , BGD for following gradient of J :
 Interpretation : For a particular sample : if h return 1/0 and y return 1/0 , the term is 0. if  h return 1/0 and y return 0/1 , the term is positive infinity. 
 \section{Logistic Regression(MLE approach)}
 \section{Softmax Regression(Multi-Class Logistic)}
+Softmax is used because it is differentiable 
 k classes, n x k parameters , and the hypothesis is :
 
 \begin{align}
@@ -405,7 +406,7 @@ Aggregration = perform averaging / voting with different Trees from different bo
 Aim to reduce variance \newline
 Ramdom Forest : Bagging + randomly remove features in build indivudal trees \newline
 
-\section{Boosting}
+\section{Adaboost}
 
 Main Idea : Boosting transform weak learner to strong classifier, by increasing the weight of wrongly classified samples to force the classifier to do well on those samples.  It is kind of ensembling ( by attaching different weights to different classifiers ). 
 
@@ -448,14 +449,15 @@ $$J(\theta) = \frac{1}{m} \sum_{i=1}^{m} w_i \exp \left( -y^{(i)} \theta_j \phi_
 
 Define \( w_i = \exp \left( -y^{(i)} \sum_{k \neq j} \theta_k \phi_k(x^{(i)}) \right) \)
 
-To optimize coordinate \( \theta_j \):
+To optimize coordinate \( \theta_j \) (***):
 
 $$\theta_j = \arg \min_{\theta_j} \sum_{i=1}^{m} w_i \exp \left( -y^{(i)} \theta_j \phi_j(x^{(i)}) \right)$$
 
-Define the weights:
+Define the weights (*) :
 
-$$w_i = \exp \left( -y^{(i)} \sum_{k \neq j} \theta_k \phi_k(x^{(i)}) \right)$$
-
+$$w_i = \exp \left( -y^{(i)} \sum_{k \neq j} \theta_k \phi_k(x^{(i)}) \right)$$ 
+Important Note : by definition of (*),  updating \( \theta_j \) corresponds to updating w, therefore we say Adaboost is updating weights of samples \newline
+By definition of (***) , it has the meaning of assigning weight \(w_i\) to sample \(x_i\), and we are finding \(\theta_j\) to do the best for classification (i.e. minimize the loss)\newline
 Optimizing coordinate \( \theta_j \) corresponds to minimizing:
 
 $$\sum_{i=1}^{m} w_i \exp \left( -y^{(i)} \theta_j \phi_j(x^{(i)}) \right)$$
@@ -464,12 +466,14 @@ Define:
 
 $$w_i^+ := \sum_{i: y^{(i)} \phi_j(x^{(i)}) = 1} w_i$$
 $$w_i^- := \sum_{i: y^{(i)} \phi_j(x^{(i)}) = -1} w_i$$
+
+
 **************************\newline
 Following is the whole algorithm  : \newline
 **************************\newline
 For each iteration \( t = 1, 2, \ldots \): \newline
 
-(i) Define weights \[ w^{(i)} = \exp \left( -y^{(i)} \sum_{\tau=1}^{t-1} \theta_{\tau} \phi_{\tau} (x^{(i)}) \right) \] 
+(i) Define weights (**) \[ w^{(i)} = \exp \left( -y^{(i)} \sum_{\tau=1}^{t-1} \theta_{\tau} \phi_{\tau} (x^{(i)}) \right) \] 
 and distribution, which is the weight (which is uniform initially) attached to each sample, we are tuning this : 
 
 \[ p^{(i)} = \frac{w^{(i)}}{\sum_{j=1}^{m} w^{(j)}} \]  
@@ -481,7 +485,10 @@ on the training set. \newline
 (iii) Compute \[ W^+_t = \sum_{i : y^{(i)} \phi_t (x^{(i)}) = 1} w^{(i)} \] 
 and 
 \[ W^-_t = \sum_{i : y^{(i)} \phi_t (x^{(i)}) = -1} w^{(i)} \] and set \[ \theta_t = \frac{1}{2} \log \frac{W^+_t}{W^-_t} . \] 
+Final note here : when 
 Proof of Boosting convergence and Discussion of weak learners : Omitted
+\section{Gradient Boosting for Regression}
+ 
 \section{Bias Variance Analysis} 
 
 \section{PCA, Principal Component Analysis}
@@ -498,6 +505,11 @@ Proof of Boosting convergence and Discussion of weak learners : Omitted
 \section{Anomaly Detection} 
 \section{Perceptron}
 \section{KL Divergence}
+\[KL(P||Q)=\sum_{x}P(x)\log(\frac{P(x)}{Q(x)})\]
+1. Measure the difference betwwen 2 distributions : You think it is Q, but actually it is P  \newline
+2. The above is for discrete distribution \newline
+3. KLD is assymetric \newline
+4. In ML , measure the Information gain if Q is used instead of P. In other words, It measures the information loss (Entropy increased ) if Q is used to approximate the true distribution (Q).  Mathematically, 
 \section{Cross Entropy}
 \section{Cross Validation}
 
