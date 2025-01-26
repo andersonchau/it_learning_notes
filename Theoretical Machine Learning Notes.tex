@@ -1,13 +1,15 @@
 \documentclass{article}
 \usepackage{amsmath}
 \usepackage{blindtext}
+
 \begin{document}
 
 \section{Foreword}
 Author : Anderson Chau
 \newline 
 \newline 
-Disclaimer : The notes are written only for my understanding and memorization purpose after I have self-studied those online lecture notes (mainly Stanford CS109, CS229, CS168, CS231n, Cornell CS4780, Andrew Ng's (I am his fan) Coursera courses ) and other online resources ( Stack Exchange, TowardDataScience ).
+Disclaimer : The notes are written only for my understanding and memorization purpose after I have self-studied those online lecture notes. 
+
 
 % ######################################################################
 % ######################################################################
@@ -42,7 +44,6 @@ Note : Mathematically, Precision and Recall are in inverse relationship, there i
 \newline
 F1 score = 2(P*R)/(P+R), a compromised metric
 
-\section{KL Divergence}
 \section{K-Nearest Neighbour}
 Description : Choose the *majority* class of nearest (e.g. Eclidean Distance ) K data points and classify it.  
 \newline
@@ -487,8 +488,34 @@ and
 \[ W^-_t = \sum_{i : y^{(i)} \phi_t (x^{(i)}) = -1} w^{(i)} \] and set \[ \theta_t = \frac{1}{2} \log \frac{W^+_t}{W^-_t} . \] 
 Final note here : when 
 Proof of Boosting convergence and Discussion of weak learners : Omitted
-\section{Gradient Boosting for Regression}
- 
+\section{Gradient Boosting - Regression}
+1. Fit F(x) to model data \newline 
+2. Fit another \(h_1(x)\) to fit the residue in 1. : \((x_1,y_1-F(x_1),(x_2,y_2-F(x_2),(x_3,y_3-F(x_3)....)\). We got F+\(h_1\) \newline
+3. Goes on to get \(F+h_1+h_2+h_3...\) \newline 
+\newline
+4. If we consider the loss function as \(L(y,F(x)) = (y - F(x))^2/2\), then we get \newline
+\(\frac{\partial J}{\partial F(x_i)} = \frac{\partial}{\partial F(x_i)} \sum_{i} L(y_i, F(x_i)) = \frac{\partial L(y_i, F(x_i))}{\partial F(x_i)} =  y_i - F(x_i)  \) \newline 
+We are actually doing Gradient descent! \newline 
+5. Note here we are treating the model \(F(x_i)\) as random variable, i.e. we are updating F instead of \(x_i\). And data dimension = number of samples \newline
+6. MSE may be susceptible by outliners. Adopt absolute loss L(y,F)=\(|y - F|\) or Huber loss: \newline
+\[
+L_{\delta}=
+    \left\{\begin{matrix}
+        \frac{1}{2}(y - \hat{y})^{2} & if \left | (y - \hat{y})  \right | < \delta\\
+        \delta ((y - \hat{y}) - \frac1 2 \delta) & otherwise
+    \end{matrix}\right.
+\]
+7. Choose proper learning reate (Omitted)
+
+\section{Gradient Boosting - Classification}
+As an Illustration , English character recognition : A-Z  : \newline
+1. Generate feature vectors  x with k dimension, n samples , e.g. \(1^{st}\) = length of longest straight line,  \(2^{nd}\) = number of pixels .... \newline
+2. Define 26 models \(F_A,F_B...F_Z\) , and corresponding \(P_A(x) .... P_Z(x) \)  by softmax , where
+\[ P_A(x) = \frac{e^{F_A(x)}}{\sum_{c=A}^{Z} e^{F_c(x)}}\]
+3. Define 26 "true" distributions (*) \(Y_c(x_i)\) , where \(x_i\) is \(i^{th}\) sammple. If \(y_5\) is G , then  \(Y_G(x_5)\) = 1 and \(Y_{c=/=G}(x_5)\) = 0. Notes : there are n x 26 values for it \newline
+4. Here, we have n x 26 variables to optimize : \(F_A(x_1),F_A(x_2)....,F_A(x_{n-1}), F_Z(x_n)\). 
+5. The loss function is KL divergence, by comparing currently adjusted F and (*).
+\section{Gradient Boosting - Ranking}
 \section{Bias Variance Analysis} 
 
 \section{PCA, Principal Component Analysis}
@@ -504,13 +531,18 @@ Proof of Boosting convergence and Discussion of weak learners : Omitted
 \section{Recommender System}
 \section{Anomaly Detection} 
 \section{Perceptron}
-\section{KL Divergence}
-\[KL(P||Q)=\sum_{x}P(x)\log(\frac{P(x)}{Q(x)})\]
+\section{KL Divergence } 
+\[KL(P||Q)=\sum_{x}P(x)\log(\frac{P(x)}{Q(x)})\] 
 1. Measure the difference betwwen 2 distributions : You think it is Q, but actually it is P  \newline
 2. The above is for discrete distribution \newline
 3. KLD is assymetric \newline
-4. In ML , measure the Information gain if Q is used instead of P. In other words, It measures the information loss (Entropy increased ) if Q is used to approximate the true distribution (Q).  Mathematically, 
+4. In ML , measure the Information loss if Q is used instead of P. In other words, It measures the information loss (Entropy increased ) if Q is used to approximate the true distribution (P).  
 \section{Cross Entropy}
+\[H(p,q)=-\sum_x p(x)\log q(x).\]
+1. It measures the average number of bits required to identify an event from one probability distribution, p, using the optimal code for another probability distribution, q. \newline 
+2. The large the difference in bit numbers : we consider it as much difference. \newline
+2. As loss function for classification , e.g. logistic regression , CNN classifier. \newline
 \section{Cross Validation}
+
 
 \end{document}
