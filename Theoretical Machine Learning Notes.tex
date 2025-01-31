@@ -514,15 +514,54 @@ As an Illustration , English character recognition : A-Z  : \newline
 \[ P_A(x) = \frac{e^{F_A(x)}}{\sum_{c=A}^{Z} e^{F_c(x)}}\]
 3. Define 26 "true" distributions (*) \(Y_c(x_i)\) , where \(x_i\) is \(i^{th}\) sammple. If \(y_5\) is G , then  \(Y_G(x_5)\) = 1 and \(Y_{c=/=G}(x_5)\) = 0. Notes : there are n x 26 values for it \newline
 4. Here, we have n x 26 variables to optimize : \(F_A(x_1),F_A(x_2)....,F_A(x_{n-1}), F_Z(x_n)\). 
-5. The loss function is KL divergence, by comparing currently adjusted F and (*).
+5. Use KL divergence as  loss function, by comparing currently adjusted F and (*).
 \section{Gradient Boosting - Ranking}
 \section{Bias Variance Analysis} 
 
 \section{PCA, Principal Component Analysis}
+We thnk that N dimensoinal data have certain "directions" - called principal axis (PA). We project those data points with reference to these axis/planes. \newline 
+Generally, (i) we could intepret the meaning of the axis by comparing (data in differente  extreme of  the axis ), or  (ii) by mapping data to the axis - dimensionality reduction.\newline
+(Stanford cs168 notes' explanation is awesome ...). \newline 
+1. The data keep the most variance (Retain the variability of data : Minimize information loss, minimize reconstruction error, remember the triangle ) if it is projected to PA(remember animation online). Or say, MAXIMIZE the projection length 
+\[ \sum_{i=1}^{n} \sum_{j=1}^{k} \langle x_i, v_j \rangle^2 \]
+where v is the PA and x is the data point\newline
+Equivalently:
+\[ \underset{v : \|v\| = 1}{\arg\max} \frac{1}{n} \sum_{i=1}^{n} \langle x_i, v \rangle^2 \]
+Since : 
+\[ v^\top X^\top X v = (Xv)^\top (Xv) = \sum_{i=1}^{n} \langle x_i, v \rangle^2 \]
+Also, by  Linear Algebra 
+\[(Xv)^\top (Xv)  = vX^\top Xv\] , \(X^\top X\) is called corvariance matrix and is Positive Semi Definite and  can be written in \(QDQ^\top\) , where D is diagonal Matrix and Q is orthogonal Matrix ( \(Q^\top Q = I\) ), \newline
+Let \(\lambda_1\)  be the lartest value in D \newline
+To maximize \(v^\top_1 A v_1\), since 
+\begin{align*}
+v^\top_1 A v_1 &= v^\top_1 Q D Q^\top v_1 \\
+&= e^\top_1 Q^\top Q D Q^\top Q e_1 \\
+&= e^\top_1 D e_1 \\
+&= \lambda_1
+\end{align*}
+
+For above shows that, the largest value of  \(v^\top_1 A v_1\) is \(\lambda_1\)(the largest eigenvalue) . And when \(v_1 = Qe_1\) , \(v^\top_1 A v_1\) attain largest value.  \newline 
+
+To compute the projection (Power Iteration / SVD )
+
+ Power Iteration
+ Given matrix A =  \(X^\top X\):
+ • Select random unit vector u0 \newline
+ • For \( i = 1, 2, \dots \), set \( u_i = A^i u_0 \). If 
+\[
+\frac{u_i}{\|u_i\|} \approx \frac{u_{i-1}}{\|u_{i-1}\|},
+\]
+then return 
+\[
+\frac{u_i}{\|u_i\|}.
+\]
+i.e. keep multiplying  A to u until converge. (Analysis omitted, SVD method omitted)
+
 \section{SVD, Singular Value Decomposition}
 \section{Backpropagation}
 \section{EM Algorithm}
-\section{Reinforcement learning}
+\section{Reinforcement learning - Discrete State}
+\section{Reinforcement learning - Continuous State}
 \section{MAP (Maximum a Posterior) vs MLE (Maximum Likelihood Estimation)} 
 \section{IDP, Indepent Component Analysis}
 
