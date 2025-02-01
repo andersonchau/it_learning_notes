@@ -522,7 +522,8 @@ As an Illustration , English character recognition : A-Z  : \newline
 We thnk that N dimensoinal data have certain "directions" - called principal axis (PA). We project those data points with reference to these axis/planes. \newline 
 Generally, (i) we could intepret the meaning of the axis by comparing (data in differente  extreme of  the axis ), or  (ii) by mapping data to the axis - dimensionality reduction.\newline
 (Stanford cs168 notes' explanation is awesome ...). \newline 
-1. The data keep the most variance (Retain the variability of data : Minimize information loss, minimize reconstruction error, remember the triangle ) if it is projected to PA(remember animation online). Or say, MAXIMIZE the projection length 
+0. \(x_i\)'s are mapped to \(v_k\)'s ( eigenvector ), Hence, N th dmension is mapped to kth dimension , where generally N is greater than k \newline
+1. The data keep the most variance (Retain the variability of data : Minimize information loss, minimize reconstruction error, remember the triangle ) if it is projected to PA(remember animation online). Or say, MAXIMIZE the projection length \newline 
 \[ \sum_{i=1}^{n} \sum_{j=1}^{k} \langle x_i, v_j \rangle^2 \]
 where v is the PA and x is the data point\newline
 Equivalently:
@@ -561,6 +562,14 @@ i.e. keep multiplying  A to u until converge. (Analysis omitted, SVD method omit
 \section{Backpropagation}
 \section{EM Algorithm}
 \section{Reinforcement learning - Discrete State}
+Markov decision processes (MDP) \newline
+Definitions :  \newline
+S : set of states. \newline 
+A : set of  actions \newline 
+\(P_{sa}\) : denote the set of  probability of action a on state s to change to another state. \newline
+\(\gamma\) between [0-1) as discount factor, to punish (decrease value function when time pass) \newline
+
+
 \section{Reinforcement learning - Continuous State}
 \section{MAP (Maximum a Posterior) vs MLE (Maximum Likelihood Estimation)} 
 \section{IDP, Indepent Component Analysis}
