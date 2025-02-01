@@ -559,6 +559,21 @@ then return
 i.e. keep multiplying  A to u until converge. (Analysis omitted, SVD method omitted)
 
 \section{SVD, Singular Value Decomposition}
+
+Definition : Any Matrix A ( m x n ) can be factorized as \(USV^T\), where \newline
+U is m x m Orthogonal Matrix , Column of U called left singular vectors \newline
+S is m x n Diagonal Matrix, entries of S called Orthogonal Matrix \newline
+V is n x n  Orthogonal Matrix. Column of  V (Row of \(V^T\)) called right singular vectors of A \newline
+\newline
+\newline
+Rank of Matrix : Minimum number of linear independent row or column in a Matrix \newline 
+Rank Factorization: Let a matrix has Rank k , then A can be factorized as \(UV^T\) \newline 
+where U is m x k and \(V^T\) is k x n \newline 
+Low Rank Approximation : remove small K , therefore A is approximated to \(A_k =U_kS_kV^T\) \newline
+Used in compression, fine tune LLM, De-noising, Matrix completion. \newline
+Relationship between SVD and PCA (TODO) \newline
+
+
 \section{Backpropagation}
 \section{EM Algorithm}
 \section{Reinforcement learning - Discrete State}
