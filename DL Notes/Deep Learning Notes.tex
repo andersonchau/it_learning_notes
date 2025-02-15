@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{amsmath}
+\usepackage{amsfonts}
 \usepackage{blindtext}
 \usepackage{graphicx}
 \graphicspath{ {./} }
@@ -40,12 +41,61 @@ a_j = \text{ReLU}(z_j),
 \[
 \mathbf{a} = [a_1, \dots, a_m]^\top \in R^m
 \]
-
+For Layer 3 :
 \[
 \bar{h}_\theta(\mathbf{x}) = \mathbf{w}^{[3]}{}^\top \mathbf{a} + b^{[3]} \quad \text{where} \quad \mathbf{w}^{[3]} \in R^n, \; b^{[3]} \in R
 \] 
 (n = 4, count vertically, is the number of number of neuron  layer, layer 2  )
-\section{Vectorization of Forward Feeding equations}
+\section{Vectorization of Forward Feeding}
+
+Just by stacking the parameters . for layer 1 : 
+\[W^{[1]} = \begin{bmatrix} - w^{[1]T}_1 - \\ - w^{[1]T}_2 - \\ \vdots \\ - w^{[1]T}_m - \end{bmatrix} \in R^{m \times d}\]
+
+\[
+\mathbf{z} = \begin{bmatrix}
+z_1 \\
+z_2 \\
+\vdots \\
+z_m
+\end{bmatrix} \in \mathbb{R}^{m \times 1} =
+\begin{bmatrix}
+-w^{[1]T}_1- \\
+-w^{[1]T}_2- \\
+\vdots \\
+-w^{[1]T}_m-
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\
+x_2 \\
+\vdots \\
+x_d
+\end{bmatrix}
++
+\begin{bmatrix}
+b^{[1]}_1 \\
+b^{[1]}_2 \\
+\vdots \\
+b^{[1]}_m
+\end{bmatrix}
+\]
+Hence we get: 
+\[ z^{[1]}=W^{[1]}x+b^{[1]} \]
+\[ a^{[1]} = ReLU(z^{[1]}) \]
+\[ z^{[2]}=W^{[2]}a^{[1]}+b^{[2]} \]
+\[ a^{[2]} = ReLU(z^{[2]}) \]
+\[ h=W^{[3]}a^{[2]}+b^{[3]} \]
+In General : 
+
+\[
+\begin{aligned}
+a^{[1]} &= \text{ReLU}(W^{[1]}x + b^{[1]}) \\
+a^{[2]} &= \text{ReLU}(W^{[2]}a^{[1]} + b^{[2]}) \\
+&\ \, \vdots \\
+a^{[r-1]} &= \text{ReLU}(W^{[r-1]}a^{[r-2]} + b^{[r-1]}) \\
+h(x) &= W^{[r]}a^{[r-1]} + b^{[r]}
+\end{aligned}
+\]
+
 \section{Vectorized Backpropagation}
 It is just matrix calculus + chain rule + gradient descent combined.
 \end{document}
