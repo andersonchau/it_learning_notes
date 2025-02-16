@@ -95,7 +95,37 @@ a^{[r-1]} &= \text{ReLU}(W^{[r-1]}a^{[r-2]} + b^{[r-1]}) \\
 h(x) &= W^{[r]}a^{[r-1]} + b^{[r]}
 \end{aligned}
 \]
+Also, for loss function J
+\[J = (1/2)(h-o)^2\]
+Some common loss function for J : Common : (1) Mean Sequared Error (2) Cross Entropy Loss 
+
+
+\section{Matrix Calculus}
+1. Jacobian of elementwise operation fuunction are diagonal. Therefore  \( \frac{\partial a^{[i]} }{\partial z^{[i]}} \) is a diagonal matrix \newline
 
 \section{Vectorized Backpropagation}
-It is just matrix calculus + chain rule + gradient descent combined.
+Our objective is to make use of matrix calculus, gradient descent to tune W and b to minimize J by SGD or mini-batch GD \newline
+
+Algo 1 SGD : 
+ 1: Hyperparameter: learning rate \(\alpha\), number of total iteration \(n_{iter}\). \newline
+ 2: Initialize \(\theta\) randomly. \newline
+ 3: for i = 1 to niter do \newline
+ 4: Sample j uniformly from {1,...,n}, and update \(\theta\) by \newline
+\[ \theta := \theta - \alpha \nabla_\theta J^{(j)}(\theta) \] 
+By Chain Rule of matrix calculus 
+\[
+\frac{\partial L }{\partial W_{ij}^{[2]}} = ( \frac{\partial L }{\partial a^{[3]}} \frac{\partial a^{[3]}}{\partial z^{[3]}} )
+(\frac{\partial z^{[3]}}{\partial a^{[2]}}) ( \frac{\partial a^{[2]}}{\partial z^{[2]}})( \frac{\partial z^{[2]}}{\partial W_{ij}^{[2]}})
+\]
+
+\[
+= [ (a^{[3]}-y)W[3] \bigodot g(z^{[2]}) ]_i a_j^{[1]T} 
+\]
+stacking up again :
+\[
+\frac{\partial L }{\partial W^{[2]}} = [ (a^{[3]}-y)W[3] \bigodot g(z^{[2]}) ] a^{[1]T} 
+\]
+We see here the step of GD is based on next layer's value, therefore we have update back propagated to previous layer.
+
+
 \end{document}
