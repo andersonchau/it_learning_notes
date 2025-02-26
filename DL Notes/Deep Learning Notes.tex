@@ -100,8 +100,42 @@ Also, for loss function J
 Some common loss function for J : Common : (1) Mean Sequared Error (2) Cross Entropy Loss 
 
 
-\section{Matrix Calculus}
-1. Jacobian of elementwise operation fuunction are diagonal. Therefore  \( \frac{\partial a^{[i]} }{\partial z^{[i]}} \) is a diagonal matrix \newline
+\section{Vector/Matrix Calculus}
+1. Gradient, where f is \(R^n to R\) : \newline
+
+ \( \nabla f(\left.x_{1}, x_{2}, \ldots, x_{n}\right)=\left[\begin{array}{c}
+\dfrac{\partial f}{\partial x_1}(\left.x_{1}, x_{2}, \ldots, x_{n}\right)\\
+\dfrac{\partial f}{\partial x_2}(\left.x_{1}, x_{2}, \ldots, x_{n}\right) \\
+\vdots \\
+\dfrac{\partial f}{\partial x_n}(\left.x_{1}, x_{2}, \ldots, x_{n}\right) 
+\end{array}\right]\) \newline
+Example : \(f(x_1,x_2) = 3x_1^2x_2\), then \( \nabla f(x_1,x_2) = [6x_1x_2,3x_1]^T \) \newline
+
+2. Jacobian of f, Note that there are m DIFFERENT functions 
+
+$$
+\begin{aligned}
+\mathbf{f}(\mathbf{x})&=\mathbf{f}(x_1,x_2,\dots,x_n)\\
+&=(f_1(x_1,x_2,\dots,x_n),,\dots,f_m(x_1,x_2,\dots,x_n))\\
+&=(f_1(\mathbf{x}),,\dots,f_m(\mathbf{x}))
+\end{aligned}
+$$
+
+$$
+\mathbb{J}=\left[\begin{array}{ccc}
+\dfrac{\partial \mathbf{f}(\mathbf{x})}{\partial x_{1}} & \cdots & \dfrac{\partial \mathbf{f}(\mathbf{x})}{\partial x_{n}}
+\end{array}\right]=\left[\begin{array}{c}
+\nabla^{T} f_{1}(\mathbf{x}) \\
+\vdots \\
+\nabla^{T} f_{m}(\mathbf{x})
+\end{array}\right]=\left[\begin{array}{ccc}
+\dfrac{\partial f_{1}(x_1,x_2....,x_n)}{\partial x_{1}} & \cdots & \dfrac{\partial f_{1}(x_1,x_2....,x_n)}{\partial x_{n}} \\
+\vdots & \ddots & \vdots \\
+\dfrac{\partial f_{m}((x_1,x_2....,x_n)}{\partial x_{1}} & \cdots & \dfrac{\partial f_{m}((x_1,x_2....,x_n)}{\partial x_{n}}
+\end{array}\right]
+$$
+
+3. Jacobian of elementwise operation fuunction are diagonal. Therefore  \( \frac{\partial a^{[i]} }{\partial z^{[i]}} \) is a diagonal matrix \newline
 
 \section{Vectorized Backpropagation}
 Our objective is to make use of matrix calculus, gradient descent to tune W and b to minimize J by SGD or mini-batch GD \newline
