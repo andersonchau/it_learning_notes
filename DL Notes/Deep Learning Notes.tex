@@ -100,7 +100,7 @@ Also, for loss function J
 Some common loss function for J : Common : (1) Mean Sequared Error (2) Cross Entropy Loss 
 
 
-\section{Vector/Matrix Calculus}
+\section{Vector/Matrix Calculus: Some important equations}
 1. Gradient, where f is \(R^n to R\) : \newline
 
  \( \nabla f(\left.x_{1}, x_{2}, \ldots, x_{n}\right)=\left[\begin{array}{c}
@@ -135,7 +135,67 @@ $$
 \end{array}\right]
 $$
 
-3. Jacobian of elementwise operation fuunction are diagonal. Therefore  \( \frac{\partial a^{[i]} }{\partial z^{[i]}} \) is a diagonal matrix \newline
+3. (Law of total derivatives) for \( f(g_1,g_2...., g_k) \) , if  \(\mathbf{EACH}\) of \( g_1,g_2...., g_k \) actually depends on \(x_1,x_2....x_n\), then 
+\[
+	\dfrac{\partial f_{m}((g_1,g_2....,g_n)}{\partial x_1} = \dfrac{\partial f}{\partial g_1}
+\dfrac{\partial g_1}{\partial x_1} + \dfrac{\partial f}{\partial g_2}
+\dfrac{\partial g_2}{\partial x_1} + .... + \dfrac{\partial f}{\partial u_n}
+\dfrac{\partial g_n}{\partial x_1}
+\]
+\[
+	\dfrac{\partial f_{m}((g_1,g_2....,g_n)}{\partial x_2} = \dfrac{\partial f}{\partial g_1}
+\dfrac{\partial g_1}{\partial x_2} + \dfrac{\partial f}{\partial g_2}
+\dfrac{\partial g_2}{\partial x_2} + .... + \dfrac{\partial f}{\partial u_n}
+\dfrac{\partial g_n}{\partial x_2}
+\]
+4. By 3 , Jacobian again, but this time : \newline 
+\[y_1=f_1(g_1(x_1,...,x_n),g_2(x_1,...,x_n),...,g_k(x_1,...,x_n))\]
+\[y_2=f_1(g_1(x_1,...,x_n),g_2(x_1,...,x_n),...,g_k(x_1,...,x_n))\]
+\[....\]
+\[y_m=f_m(g_1(x_1,...,x_n),g_2(x_1,...,x_n),...,g_k(x_1,...,x_n))\]
+\[\mathbf{y} =(y_1,y_2...,y_m) ,  \mathbf{x} = (x_1,...,x_n) \]
+\[J=\dfrac{\partial \mathbf{y}}{\partial \mathbf{x}} = \left[\begin{array}{c}
+\nabla^{T} f_{1}(\mathbf{x}) \\
+\nabla^{T} f_{2}(\mathbf{x}) \\
+\vdots \\
+\nabla^{T} f_{m}(\mathbf{x})
+\end{array}\right]
+\]
+
+\[
+=\begin{bmatrix}
+ \dfrac{\partial f_1}{\partial x_1} & \dfrac{\partial f_1}{\partial x_2} & \cdots & \dfrac{\partial f_1}{\partial x_n} \\ 
+ \dfrac{\partial f_2}{\partial x_1} & \dfrac{\partial f_2}{\partial x_2} & \cdots & \dfrac{\partial f_2}{\partial x_n} \\ 
+ \cdots & \cdots & \cdots & \cdots \\ 
+ \dfrac{\partial f_m}{\partial x_1} & \dfrac{\partial f_m}{\partial x_2} & \cdots & \dfrac{\partial f_m}{\partial x_n}
+\end{bmatrix}
+\]
+
+\[
+=\begin{bmatrix}
+ \sum_{i=1}^k \dfrac{\partial f_1}{\partial g_i} \dfrac{\partial g_i}{\partial x_1} & \sum_{i=1}^k \dfrac{\partial f_1}{\partial g_i} \dfrac{\partial g_i}{\partial x_2} & \cdots & \sum_{i=1}^k \dfrac{\partial f_1}{\partial g_i} \dfrac{\partial g_i}{\partial x_2} \\ 
+ \sum_{i=1}^k \dfrac{\partial f_2}{\partial g_i} \dfrac{\partial g_i}{\partial x_1} & \sum_{i=1}^k \dfrac{\partial f_2}{\partial g_i} \dfrac{\partial g_i}{\partial x_2} & \cdots & \sum_{i=1}^k \dfrac{\partial f_2}{\partial g_i} \dfrac{\partial g_i}{\partial x_2} \\ 
+ \cdots & \cdots & \cdots & \cdots \\ 
+ \sum_{i=1}^k \dfrac{\partial f_m}{\partial g_i} \dfrac{\partial g_i}{\partial x_1} & \sum_{i=1}^k \dfrac{\partial f_m}{\partial g_i} \dfrac{\partial g_i}{\partial x_2} & \cdots & \sum_{i=1}^k \dfrac{\partial f_m}{\partial g_i} \dfrac{\partial g_i}{\partial x_2}
+\end{bmatrix}
+\]
+\[
+=\begin{bmatrix}
+ \dfrac{\partial f_1}{\partial g_1} & \dfrac{\partial f_1}{\partial g_2} & \cdots & \dfrac{\partial f_1}{\partial g_k} \\ 
+ \cdots & \cdots & \cdots & \cdots \\ 
+ \dfrac{\partial f_m}{\partial g_1} & \dfrac{\partial f_m}{\partial g_2} & \cdots & \dfrac{\partial f_m}{\partial g_k}
+\end{bmatrix}
+\begin{bmatrix}
+ \dfrac{\partial g_1}{\partial x_1} & \dfrac{\partial g_1}{\partial x_2} & \cdots & \dfrac{\partial g_1}{\partial x_n} \\ 
+ \cdots & \cdots & \cdots & \cdots \\ 
+ \dfrac{\partial g_k}{\partial x_1} & \dfrac{\partial g_k}{\partial x_2} & \cdots & \dfrac{\partial g_k}{\partial x_n}
+\end{bmatrix}
+\]
+
+5. Jacobian of elementwise operation fuunction are diagonal. Therefore  \( \frac{\partial a^{[i]} }{\partial z^{[i]}} \) is a diagonal matrix \newline
+
+
+
 
 \section{Vectorized Backpropagation}
 Our objective is to make use of matrix calculus, gradient descent to tune W and b to minimize J by SGD or mini-batch GD \newline
@@ -160,6 +220,9 @@ stacking up again :
 \frac{\partial L }{\partial W^{[2]}} = [ (a^{[3]}-y)W[3] \bigodot g(z^{[2]}) ] a^{[1]T} 
 \]
 We see here the step of GD is based on next layer's value, therefore we have update back propagated to previous layer.
-
+\section{Testing}
+\[
+\sum_{i=1}^k \frac{\partial f_i}{\partial x_i} dx_i
+\]
 
 \end{document}
