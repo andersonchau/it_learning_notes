@@ -1,8 +1,13 @@
 \documentclass{article}
 \usepackage{amsmath}
 \usepackage{blindtext}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsfonts}
 
 \begin{document}
+
+\section{Testing}
+
 
 \section{Foreword}
 Author : Anderson Chau
@@ -516,7 +521,23 @@ As an Illustration , English character recognition : A-Z  : \newline
 4. Here, we have n x 26 variables to optimize : \(F_A(x_1),F_A(x_2)....,F_A(x_{n-1}), F_Z(x_n)\). 
 5. Use KL divergence as  loss function, by comparing currently adjusted F and (*).
 \section{Gradient Boosting - Ranking}
+\section{Regularized Linear Regression}
+\[J(\theta) = \frac{1}{2m}  \sum_{i=1}^{m} \left( h_{\theta}(x^{(i)}) - y^{(i)} \right)^2 + \lambda \sum_{j=1}^{n} \theta_{j}^2 \]
+1. To reduce overfitting : we add lambda which aims to minimize the magnitude \(\theta\). The larger Lambda (Hyperparameter)gives smaller \(\theta\). \newline
+2. Note here lambda is also divided by training size (m). When m increase, the regularization effect is reduced. One explanation is : the purpose of R is to reduce overfitting, we should put more emphais on the added data iteslef. 
+
+
+
 \section{Bias Variance Analysis} 
+Let \(\hat{\theta}_n\) be estimators(or say sampling data parameters),\(\theta^*\) be true population parameters. The following shows that MSE comprise of Bias and Variance. 
+\begin{align*}
+\text{MSE}(\hat{\theta}_n) &= \mathbb{E} \left[ \| \hat{\theta}_n - \theta^* \|^2 \right] \\
+&= \mathbb{E} \left[ \| \hat{\theta}_n - \mathbb{E}[\hat{\theta}_n] + \mathbb{E}[\hat{\theta}_n] - \theta^* \|^2 \right] \\
+&= \mathbb{E} \left[ \| \hat{\theta}_n - \mathbb{E}[\hat{\theta}_n] \|^2 + \| \mathbb{E}[\hat{\theta}_n] - \theta^* \|^2 + 2 (\hat{\theta}_n - \mathbb{E}[\hat{\theta}_n])^T (\mathbb{E}[\hat{\theta}_n] - \theta^*) \right] \\
+&= \mathbb{E} \left[ \| \hat{\theta}_n - \mathbb{E}[\hat{\theta}_n] \|^2 \right] + \| \mathbb{E}[\hat{\theta}_n] - \theta^* \|^2 \\
+&= \text{tr} \left( \mathbb{E} \left[ (\hat{\theta}_n - \mathbb{E}[\hat{\theta}_n]) (\hat{\theta}_n - \mathbb{E}[\hat{\theta}_n])^T \right] \right) + \| \mathbb{E}[\hat{\theta}_n] - \theta^* \|^2 \\
+&= \text{tr} \left( \text{Var}(\hat{\theta}_n) \right) + \| \text{Bias}(\hat{\theta}_n) \|^2.
+\end{align*}
 
 \section{PCA, Principal Component Analysis}
 We thnk that N dimensoinal data have certain "directions" - called principal axis (PA). We project those data points with reference to these axis/planes. \newline 
