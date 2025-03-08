@@ -538,6 +538,10 @@ Let \(\hat{\theta}_n\) be estimators(or say sampling data parameters),\(\theta^*
 &= \text{tr} \left( \mathbb{E} \left[ (\hat{\theta}_n - \mathbb{E}[\hat{\theta}_n]) (\hat{\theta}_n - \mathbb{E}[\hat{\theta}_n])^T \right] \right) + \| \mathbb{E}[\hat{\theta}_n] - \theta^* \|^2 \\
 &= \text{tr} \left( \text{Var}(\hat{\theta}_n) \right) + \| \text{Bias}(\hat{\theta}_n) \|^2.
 \end{align*}
+\newline
+BV tradeoff : decrease B will increase V. Increase model complexity. \newline 
+Intuition to the tradeoff.  If the model is too simple, we are missing some features to model the data. When we increase the model complexity, the model capture the noise in training data which may not appear in validation data. Therefore the model fail to generalize (overfitting). \newline
+We have to find a sweetspot which balance B and V. \newline
 
 \section{PCA, Principal Component Analysis}
 We thnk that N dimensoinal data have certain "directions" - called principal axis (PA). We project those data points with reference to these axis/planes. \newline 
