@@ -485,6 +485,12 @@ Therefore
 \frac{\partial L }{\partial W^{[2]}} = [ (a^{[3]}-y)W[3] \bigodot g(z^{[2]}) ] a^{[1]T} 
 \]
 We see here the step of GD is based on next layer's value, therefore we have update back propagated to previous layer.
+\section{Parameters Initialization}
+To all zeros / or same values, Problem : it will lead to all parmeters to still be the samee after feeding data. \newline
+If not initialized properly, May suffer from vanishing or exploding gradient : Activation layers are saturated ( either 1, 0 or -1 ) , after several layers, the parameter either staurated or become very near to zero, making the learning process slow. \newline
+Solution (Xavier Initialization : Best Explanation : https://www.deeplearning.ai/ai-notes/initialization/index.html ). \newline
+Idea to keep variance of activation same across different layer (eq. 1) and having mean zero. \newline
+For ReLU, we use He Initialization.
 \section{Testing}
 \[
 \sum_{i=1}^k \frac{\partial f_i}{\partial x_i} dx_i
