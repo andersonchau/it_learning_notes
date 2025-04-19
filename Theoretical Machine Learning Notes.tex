@@ -592,15 +592,35 @@ V is n x n  Orthogonal Matrix. Column of  V (Row of \(V^T\)) called right singul
 \newline
 \newline
 Rank of Matrix : Minimum number of linear independent row or column in a Matrix \newline 
-Rank Factorization: Let a matrix has Rank k , then A can be factorized as \(UV^T\) \newline 
+Rank Factorization: Let a matrix has Rank k , then A can be factorized as \(USV^T\) \newline 
 where U is m x k and \(V^T\) is k x n \newline 
 Low Rank Approximation : remove small K , therefore A is approximated to \(A_k =U_kS_kV^T\) \newline
 Used in compression, fine tune LLM, De-noising, Matrix completion. \newline
 Relationship between SVD and PCA (TODO CS168 notes) \newline
 
+Facts to Remember \(A=USV^T\) \newline 
+(i) U are columns of (left ) singular vectors, which are orthogonal (unit and perpendicular) to each other  \newline
+(ii) \(V^T\) are rows of (right) singular vectors , which are orthogonal  \newline
+(iii)  Singular vectors : Similar to principal axis in PCA, which meaning may (not) be interpretable\newline
+(iv) S is diagonal, with decreasing constants\newline 
+(v) Singular vectors may(not) be interpretable. \newline
 
-\section{Backpropagation}
+\section{Example SVD Application : Recommender System}
+Input Data : \newline
+Rows of A : audience 1,2.... \newline
+Columns of A : Movie 1,2,3.... \newline
+Element of A : Score given by auidence to each movie .... \newline
+After SVD and low-rank Approximation : \newline
+Row of U , singular vectors of audience N, which represent the taste of auidence \newline
+Columns of \(V^T\)   , singular vectors of Movie N,  which represent the some qualities of the movie. \newline
+By using vector search ( e.g. cosine), we can find the similarity of taste of audience, and recommend movie to him. (e.g. by filling missing values)
+\section{SVD Application : Word Embedding, Establishing word similarity as vectors}
+Input Data : \newline
+\(A_{ij}\) : number of occurrance word i and word j in the same document  \newline
+After SVD and low-rank Approximation, each row of U represent the vector representation of each word \newline
+Then we can do vector search(Cosine) for word similarity .e.g. MongoDB \newline
 \section{EM Algorithm}
+
 \section{Reinforcement learning - Discrete State}
 Markov decision processes (MDP) \newline
 Definitions :  \newline
