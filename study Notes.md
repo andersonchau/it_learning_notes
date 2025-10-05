@@ -1,6 +1,12 @@
-# IT/Software Engineering/Programming/Web Development notes
+# IT System/Software Engineering/Programming/Web Development notes
 
 ## Web Development and Others
+
+
+### General HTTP code 
+- 2xx - Generally OK (200) but ( with other 2xx variation ), 3xx - Redireciton , 4xx - Client side reported error , 5xx - Server side reported error
+- 401(Forbiddened) : Server don't recognize you. Frontend handling : logout, clear cache, back to main page 
+- 403(UnAuthorized) : Server recognize you , but not enough rights to access resources, FE handling : display forbiddened (or not enough access right)
 
 ### Redirect (HTTP 302) 
 - Backend tell frontend to go to another URL by http 302
@@ -11,6 +17,7 @@
 ```
 - Used in OAuth2, redirecting back to original page in Application 
 - Used in HTTP to HTTPS redirection
+- Used in setting up maintenance page 
 
 ### URL Rewriting 
 - Purely done in backend , not noticeable by client
@@ -23,9 +30,31 @@
 ```
 
 
-### HTTP 401(Forbiddened) vs 403 (UnAuthorized)
-- 401 : Server don't recognize you. Frontend handling : logout, clear cache, back to main page 
-- 403 : Server recognize you , but not enough rights to access resources, FE handling : display forbiddened (or not enough access right)
+
+
+### Caching (with HTTP headers) 
+- Expires: <DateTime> , tell client browser the resource will be expired after <DateTime>, client should make the real HTTP request afterwards  
+- Cache-Control: max-age=30, differential, resource expires after 30 seconds , override Expires
+- eTag : when resource going to expire , browser send GET resource with <If-None-Match> <eTag value> , server return 304 (not modified) , if not return actual resource
+
+
+
+### Cookie 
+
+### API Caching
+- 
+- 
+
+### Local Storage and Session Storage 
+-
+- 
+
+### Web Dev Tools
+- Mockoon : Recommended for Mock API Server
+- Postman : good for client and Mock API Server 
+- 
+
+
 
 
 ### OAuth2 Single-Sign-On flow (Assume we are developing ABC application)
@@ -67,16 +96,18 @@
 
 
 ### CORS 
-- A scheme to disallow web page calling external site's resources (including APIs)
+- A scheme to disallow web page calling external site's resources using JS (e.g. AJAX) (including APIs) 
 - When access resources, Server generated : Access-Control-Allow-Origin: https://example.com -> JS in webpage (with Origin: https://example.com) is only allowed to access resources.
-- Browser will do checking by comparing  Access-Control-Allow-Origin and Origin, if unmatched -> return 403 
-- Access-Control-Allow-Origin: \* , allow resource to be access from other site
+- Browser will check by comparing  Access-Control-Allow-Origin and Origin, if unmatched -> return 403, ( checked and forbiddened by Browser) 
+- Access-Control-Allow-Origin: \* , allow resource to be accessed from ALL other sites
+- Access-Control-Allow-Origin: https://mysite.com {must match protocol (https), domain name(mysite.com) and port number (443) , allow resource to be accessed mysite.com (Useful when API server serving mysite.com is from another site) 
+- Access-Control-Allow-Origin header can be added in Application Server/Web Server.
 - Other controlling headers : Access-Control-Request-Method / Access-Control-Request-Headers
 - Extra : Server side should also check the incoming "Origin: xx" header for better security. 
 
 ### CSRF ( Cross Site Request Forgery )
 - Prevention - CSRF Token : A one-time token sent from server to frontend page (probably containing a FORM ), the form POST back CSRF token
-- To prevent cross-site access by matching server assigned token 
+- To prevent cross-site access or multiple access by matching server assigned token 
 - e.g. In Spring Security , it can insert hidden field in input tag <input type="hidden" name="_csrf" value="4bfd1575-3ad1-4d21-96c7-4ef2d9f86721"/> 
 
 ### XSS Attack by Example : 
@@ -96,6 +127,7 @@
 
 ## IT-Products
 
+
 ### IT-Product : Apache HTTPD
 - Static content hosting (HTML/CSS/JS) 
 - DMZ Face
@@ -113,7 +145,7 @@
 
 ### IT-Product : JBoss 
 - Servlet Container ( for Servlet , Angular/React packaged to WAR, Spring Application ) 
-- JBoss EAP ( Commercial Version Supported by Redhat ) 
+- JBoss EAP ( Commercial Version Supported by Redhat ) , JBoss AS (obselete)
 - Wildfly (prev. JBoss AS) -- community version of JBoss
 - JNDI connection to DB with connection pool 
 - SSL Handling 
@@ -121,6 +153,8 @@
 - Undertow HTTP Handler ( work like Tomcat) 
 - Extra Enterprise Level Services ( e.g. ActiveMQ,Mail, Caching )  
 - HA Mode vs Standalone mode 
+- vs Tomcat ( TC is a web container , but JBoss is a J2EE container) 
+
 
 ### IT-Product : Queue-IT 
 - Waiting room feature, controlling the ther number of user to enter the protected site per minute (Speed) 
