@@ -35,19 +35,24 @@
 ### Caching (with HTTP headers) 
 - Expires: <DateTime> , tell client browser the resource will be expired after <DateTime>, client should make the real HTTP request afterwards  
 - Cache-Control: max-age=30, differential, resource expires after 30 seconds , override Expires
-- eTag : when resource going to expire , browser send GET resource with <If-None-Match> <eTag value> , server return 304 (not modified) , if not return actual resource
+- Update Method 1 : eTag : when resource going to expire , browser send GET resource with <If-None-Match> <eTag value> , server return 304 (not modified) , if not return actual resource
+- Update Method 2 : Server return <Last Modified> <DT> , Client send <If-Modified-Since> <DT> -> server return 304 or actual content.
+- M2 is slightly better than 1 because if server resource has it Last modified time updated but no content update => content is sent by M2 but not M1
+- Cache-Control: no-cache : to ask for any fresh copy for each request. 
+- Notice the header adding sequence : WAF/Web Server/Application Server/Application
+
+### Caching for SPA(React, Angular , Vue), with rollout concerns 
+- To ensure fresh copy are always be retreived.
+- use "Cache-Control: no-store" in frontepage (index.html), it means that server ask client "Never store data locally" 
+- Every build will create abc.e610b1e12ac232.js , this will enforce pages are not cached after updated. 
+- Under HA environment, load balancer stickiness is needed for zero down time 
 
 
 
-### Cookie 
-
-### API Caching
-- 
-- 
-
-### Local Storage and Session Storage 
--
-- 
+### Cookie, Local Storage and Session Storage, Server Session. 
+- Local Storage : stay even after browser is closed, max 5MB, unless explicitly cleared , not suitable to store JWT token 
+- Session Storage : close after browser tab is closed. 
+- If you develop application in HA envrionment, check for session, either Application server (JBoss) support clustered session, or use Stateless token (JWT Token)
 
 ### Web Dev Tools
 - Mockoon : Recommended for Mock API Server
